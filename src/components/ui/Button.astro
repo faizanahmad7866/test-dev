@@ -1,0 +1,29 @@
+---
+/**
+ * Primary call-to-action. Always renders an <a>: every CTA on this site navigates.
+ * Uses brand-700, not the logo red, so white label text clears WCAG AA.
+ * `class` is for layout only (width, margin). Toggle visibility on a wrapper — a `hidden`
+ * passed here loses to the built-in `inline-flex`.
+ */
+import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+
+interface Props {
+  href: string;
+  size?: 'md' | 'lg';
+  class?: string;
+}
+
+const { href, size = 'md', class: className } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'group inline-flex items-center justify-center gap-2 rounded-full bg-brand-700 font-semibold text-white shadow-cta transition-colors hover:bg-brand-800 active:bg-brand-900',
+    size === 'md' ? 'h-11 px-5 text-sm' : 'h-14 px-7 text-base',
+    className,
+  ]}
+>
+  <slot />
+  <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+</a>

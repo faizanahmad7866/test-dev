@@ -1,0 +1,92 @@
+---
+/**
+ * Sticky site header: logo, primary nav and the dealer CTA.
+ * Desktop links show from lg; below that the menu button opens MobileMenu. No client JS.
+ */
+import Button from '@/components/ui/Button.astro';
+import MobileMenu from '@/components/layout/MobileMenu.astro';
+import SiteLogo from '@/components/layout/SiteLogo.astro';
+import { headerCta, primaryNav } from '@/config/navigation';
+import { isCurrentPath } from '@/lib/is-current-path';
+
+const MOBILE_MENU_ID = 'mobile-menu';
+const { pathname } = Astro.url;
+---
+
+<header class="site-header sticky top-0 z-40 bg-white">
+  <div class="bg-rainbow h-1" aria-hidden="true"></div>
+
+  <div class="border-b border-ink-200">
+    <div class="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-4 sm:px-6 lg:h-20 lg:px-8">
+      <SiteLogo />
+
+      <nav aria-label="Primary" class="hidden lg:block">
+        <ul class="flex items-center gap-1">
+          {primaryNav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isCurrentPath(pathname, item.href) ? 'page' : undefined}
+                class="relative inline-flex h-11 items-center rounded-full px-4 text-nav font-semibold text-ink-600 transition-colors after:absolute after:inset-x-0 after:bottom-1 after:mx-auto after:h-0.5 after:w-5 after:rounded-full after:bg-brand-600 after:opacity-0 after:transition-opacity hover:bg-ink-50 hover:text-navy-900 current:text-navy-900 current:after:opacity-100 motion-reduce:transition-none"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:block">
+          <Button href={headerCta.href}>{headerCta.label}</Button>
+        </div>
+
+        <button
+          type="button"
+          popovertarget={MOBILE_MENU_ID}
+          aria-label="Open menu"
+          class="grid size-11 place-items-center rounded-full border border-ink-200 text-navy-900 transition-colors hover:bg-ink-100 active:bg-ink-200 lg:hidden"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            class="size-5"
+          >
+            <path d="M3 6.5h14M3 13.5h14"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <MobileMenu id={MOBILE_MENU_ID} />
+</header>
+
+<style>
+  /* Lift the header off the page once content scrolls under it. Browsers without
+     scroll-driven animations keep the hairline border, which is enough on its own. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .site-header {
+        animation: header-elevate linear both;
+      }
+
+      /* Separate rule on purpose: in one rule the minifier folds animation-timeline into the
+         `animation` shorthand, which Chrome rejects — dropping the effect entirely. */
+      .site-header:where(header) {
+        animation-timeline: scroll();
+        animation-range: 0 6rem;
+      }
+    }
+  }
+
+  @keyframes header-elevate {
+    to {
+      box-shadow: var(--shadow-header);
+    }
+  }
+</style>

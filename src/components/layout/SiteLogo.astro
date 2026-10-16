@@ -1,0 +1,17 @@
+---
+/** Brand logo linking home. Shared by the header bar and the mobile menu so both stay identical. */
+import { Image } from 'astro:assets';
+import logo from '@/assets/brand/dinar-logo.png';
+import { site } from '@/config/site';
+---
+
+<a href="/" class="inline-flex shrink-0 rounded-md">
+  <Image
+    src={logo}
+    alt={`${site.name} — home`}
+    widths={[88, 176, 264]}
+    sizes="(min-width: 1024px) 88px, 69px"
+    loading="eager"
+    class="h-11 w-auto lg:h-14"
+  />
+</a>

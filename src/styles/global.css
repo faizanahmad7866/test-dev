@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+
+/* Only our tokens exist — Tailwind's default palette is cleared so off-brand colours can't sneak in. */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Logo wordmark red. 600 is the logo itself; 700+ for anything carrying white text (AA). */
+  --color-brand-50: #fff1f1;
+  --color-brand-100: #ffdfe0;
+  --color-brand-200: #ffc4c6;
+  --color-brand-500: #ff2f35;
+  --color-brand-600: #f00209;
+  --color-brand-700: #c80208;
+  --color-brand-800: #a5070c;
+  --color-brand-900: #880c10;
+
+  /* "DETERGENT" lockup navy. */
+  --color-navy-50: #eef0ff;
+  --color-navy-100: #dfe2ff;
+  --color-navy-700: #0b13a8;
+  --color-navy-800: #080e8f;
+  --color-navy-900: #060b7c;
+  --color-navy-950: #03054a;
+
+  /* Logo wave blue. */
+  --color-ocean-500: #2b7de9;
+  --color-ocean-600: #045dd1;
+  --color-ocean-700: #034aa7;
+
+  /* Rainbow arc accents — decorative only, never for text. */
+  --color-sun-400: #f8e509;
+  --color-ember-500: #f0830d;
+
+  /* Cool neutrals tinted toward the navy. */
+  --color-ink-50: #f6f7fb;
+  --color-ink-100: #eef0f6;
+  --color-ink-200: #e2e5ef;
+  --color-ink-300: #c9cede;
+  --color-ink-500: #6b7190;
+  --color-ink-600: #50566f;
+  --color-ink-700: #3a3f55;
+  --color-ink-900: #11142b;
+
+  --text-nav: 0.9375rem;
+  --text-nav--line-height: 1.25rem;
+
+  --shadow-cta: 0 1px 2px rgb(200 2 8 / 0.25), 0 8px 20px -6px rgb(200 2 8 / 0.5);
+  --shadow-header: 0 1px 0 rgb(6 11 124 / 0.04), 0 8px 24px -12px rgb(6 11 124 / 0.18);
+
+  --animate-menu-item-in: menu-item-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes menu-item-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+  }
+}
+
+/* Astro's Font component defines --font-jakarta at runtime, so the theme must reference it inline. */
+@theme inline {
+  --font-sans: var(--font-jakarta);
+}
+
+@custom-variant current (&[aria-current='page']);
+
+/* Mirrors the rainbow arc in the logo: red → orange → yellow → blue. */
+@utility bg-rainbow {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-brand-600) 0%,
+    var(--color-ember-500) 30%,
+    var(--color-sun-400) 50%,
+    var(--color-ocean-600) 75%,
+    var(--color-navy-900) 100%
+  );
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-ocean-600);
+    outline-offset: 3px;
+  }
+}
