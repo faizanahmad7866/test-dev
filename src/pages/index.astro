@@ -1,9 +1,47 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getImage } from 'astro:assets';
+import logo from '@/assets/brand/dinar-logo.png';
+import heroPoster from '@/assets/video/dinar-hero-poster.jpg';
 import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import HomeHeroSection from '@/sections/home/HomeHeroSection.astro';
+
+const POSTER_SIZES = '(min-width: 1920px) 1920px, 100vw';
+const poster = await getImage({
+  src: heroPoster,
+  widths: [640, 960, 1280, 1920],
+  format: 'webp',
+});
+const schemaLogo = await getImage({ src: logo, width: 512, format: 'png' });
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: site.name,
+  url: site.url,
+  logo: new URL(schemaLogo.src, site.url).href,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: site.supportPhone,
+    contactType: 'customer support',
+    areaServed: 'IN',
+  },
+};
 ---
 
 <BaseLayout
   title={site.name}
-  description="Dinar detergent powder, detergent cake and Super Wash for everyday laundry."
-/>
+  description="Dinar Super Wash detergent powder and Dinar Detergent Cake. Freshness and brilliance after every wash, for hand and machine laundry."
+  image={heroPoster}
+  schema={schema}
+>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    imagesrcset={poster.srcSet.attribute}
+    imagesizes={POSTER_SIZES}
+    fetchpriority="high"
+  />
+  <HomeHeroSection poster={poster} sizes={POSTER_SIZES} />
+</BaseLayout>

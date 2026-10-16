@@ -29,6 +29,16 @@
   --color-ocean-600: #045dd1;
   --color-ocean-700: #034aa7;
 
+  /* Deep blue sampled from the range photography, so hero imagery melts into the page. */
+  --color-abyss-950: #000d27;
+  --color-abyss-900: #03204c;
+  --color-abyss-800: #06265b;
+
+  /* Pale blue backdrop of the pack shots — product stages use it so photos sit seamlessly. */
+  --color-mist-50: #f3f8fd;
+  --color-mist-100: #e4f0fb;
+  --color-mist-200: #d3e4f4;
+
   /* Rainbow arc accents — decorative only, never for text. */
   --color-sun-400: #f8e509;
   --color-ember-500: #f0830d;
@@ -38,15 +48,26 @@
   --color-ink-100: #eef0f6;
   --color-ink-200: #e2e5ef;
   --color-ink-300: #c9cede;
+  --color-ink-400: #9aa0b8;
   --color-ink-500: #6b7190;
   --color-ink-600: #50566f;
   --color-ink-700: #3a3f55;
+  --color-ink-800: #23273d;
   --color-ink-900: #11142b;
+  /* Near-black for editorial headings and the trade band: quieter than the logo navy. */
+  --color-ink-950: #0a0c1c;
+
+  /* Widest the hero film is shown: its native 1920px, so it is never upscaled past source. */
+  --container-cinema: 120rem;
+
+  /* Frame for wide packs such as the cake, close to their own 2.36:1 photography. */
+  --aspect-wide: 21 / 9;
 
   --text-nav: 0.9375rem;
   --text-nav--line-height: 1.25rem;
 
   --shadow-cta: 0 1px 2px rgb(200 2 8 / 0.25), 0 8px 20px -6px rgb(200 2 8 / 0.5);
+  --shadow-card: 0 28px 56px -28px rgb(6 11 124 / 0.35);
   --shadow-header: 0 1px 0 rgb(6 11 124 / 0.04), 0 8px 24px -12px rgb(6 11 124 / 0.18);
 
   --animate-menu-item-in: menu-item-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -59,9 +80,14 @@
   }
 }
 
-/* Astro's Font component defines --font-jakarta at runtime, so the theme must reference it inline. */
+/*
+ * Astro's Font component defines these variables at runtime, so the theme references them inline.
+ * Devanagari comes first: its faces only cover Hindi code points, so Latin text falls through
+ * to Plex Sans, while Hindi is set in the matching Plex cut before any system font is tried.
+ */
 @theme inline {
-  --font-sans: var(--font-jakarta);
+  --font-sans: var(--font-plex-devanagari), var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
 }
 
 @custom-variant current (&[aria-current='page']);
@@ -76,6 +102,27 @@
     var(--color-ocean-600) 75%,
     var(--color-navy-900) 100%
   );
+}
+
+/* The light burst behind the range photo, extended across the whole hero band. */
+@utility bg-hero {
+  background-image:
+    radial-gradient(
+      ellipse 55% 60% at 70% 40%,
+      color-mix(in oklab, var(--color-ocean-600) 45%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--color-abyss-950), var(--color-abyss-800));
+}
+
+/* Studio-style backdrop for pack shots: a soft highlight over the pack-shot blue. */
+@utility bg-stage {
+  background-image: radial-gradient(
+    ellipse 70% 60% at 50% 35%,
+    var(--color-white),
+    transparent 70%
+  );
+  background-color: var(--color-mist-100);
 }
 
 @layer base {

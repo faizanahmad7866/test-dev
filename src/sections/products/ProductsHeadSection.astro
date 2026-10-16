@@ -1,0 +1,75 @@
+---
+/**
+ * Products page opening: an editorial title on white, then the range photograph full-bleed
+ * with a caption, the way a printed catalogue opens. The photo is the LCP element, so the
+ * page hands in a pre-built image it also preloads.
+ */
+import type { GetImageResult } from 'astro';
+import Container from '@/components/ui/Container.astro';
+
+interface Props {
+  banner: GetImageResult;
+  sizes: string;
+}
+
+const { banner, sizes } = Astro.props;
+---
+
+<section aria-labelledby="products-title" class="pt-8 lg:pt-12">
+  <Container>
+    <nav aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm text-ink-500">
+        <li>
+          <a href="/" class="transition-colors hover:text-ink-950">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/products/" aria-current="page" class="text-ink-950">
+            Products
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="mt-14 grid gap-8 lg:mt-20 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-7">
+        <p lang="hi" class="text-lg font-medium text-brand-700">
+          उत्पाद
+        </p>
+        <h1
+          id="products-title"
+          class="mt-2 text-5xl font-semibold tracking-tight text-ink-950 sm:text-7xl lg:text-8xl"
+        >
+          The Dinar range
+        </h1>
+      </div>
+      <p class="max-w-md text-lg leading-8 text-pretty text-ink-600 lg:col-span-5 lg:justify-self-end">
+        Dinar makes detergent powder and detergent cake for everyday laundry. This is the full
+        range, with every pack size and its MRP.
+      </p>
+    </div>
+  </Container>
+
+  <figure class="mx-auto mt-12 w-full max-w-cinema lg:mt-16">
+    {/* getImage + <img> rather than <Image>: the same srcset must also feed the head preload. */}
+    <img
+      src={banner.src}
+      srcset={banner.srcSet.attribute}
+      sizes={sizes}
+      width={banner.attributes['width']}
+      height={banner.attributes['height']}
+      alt="The Dinar range on a deep blue backdrop with coloured ribbons and water droplets"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      class="h-auto w-full"
+    />
+    <Container>
+      <figcaption class="mt-4 text-sm text-ink-500">
+        From left: Detergent Cake, two Detergent Powder packs and Super Wash.
+      </figcaption>
+    </Container>
+  </figure>
+</section>

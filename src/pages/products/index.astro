@@ -1,0 +1,38 @@
+---
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import rangeLineup from '@/assets/brand/dinar-range-lineup.jpg';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { buildProductsPageSchema } from '@/lib/schema/products-page-schema';
+import ProductListSection from '@/sections/products/ProductListSection.astro';
+import ProductRangeSection from '@/sections/products/ProductRangeSection.astro';
+import ProductsHeadSection from '@/sections/products/ProductsHeadSection.astro';
+import TradeEnquirySection from '@/sections/products/TradeEnquirySection.astro';
+
+const BANNER_SIZES = '(min-width: 1920px) 1920px, 100vw';
+
+const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+const banner = await getImage({ src: rangeLineup, widths: [640, 960, 1376], format: 'webp' });
+const schema = await buildProductsPageSchema(products, new URL(Astro.url.pathname, site.url));
+---
+
+<BaseLayout
+  title="Products"
+  description="Dinar Super Wash detergent powder in 500 g, 1 kg and 5 kg packs, and Dinar Detergent Cake. Pack sizes, MRPs and what each product does."
+  image={rangeLineup}
+  schema={schema}
+>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    imagesrcset={banner.srcSet.attribute}
+    imagesizes={BANNER_SIZES}
+    fetchpriority="high"
+  />
+  <ProductsHeadSection banner={banner} sizes={BANNER_SIZES} />
+  <ProductListSection products={products} />
+  <ProductRangeSection products={products} />
+  <TradeEnquirySection />
+</BaseLayout>

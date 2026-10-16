@@ -1,0 +1,60 @@
+---
+/**
+ * The detail chapter for one product family: a ruled chapter head, the name and its promise,
+ * the copy beside a spec sheet, then the formula grouped by what it does. Packs and MRPs
+ * live in the product list above, so they are not repeated here.
+ */
+import FeatureGroups from '@/components/products/FeatureGroups.astro';
+import SpecSheet from '@/components/products/SpecSheet.astro';
+import type { Product } from '@/content.config';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const { id, data } = product;
+const headingId = `${id}-title`;
+const packList = new Intl.ListFormat('en-IN', { type: 'conjunction' }).format(
+  data.variants.map(({ label }) => label),
+);
+---
+
+<article id={id} aria-labelledby={headingId} class="scroll-mt-24 border-t border-ink-950 pt-5">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 text-sm">
+    <p class="flex items-baseline gap-3">
+      <span class="font-mono text-ink-500">{String(data.order).padStart(2, '0')}</span>
+      <span class="font-medium text-ink-950">{data.category}</span>
+      <span lang="hi" class="text-ink-500">
+        {data.categoryHi}
+      </span>
+    </p>
+    <p class="text-ink-500">Available in {packList}</p>
+  </div>
+
+  <h2
+    id={headingId}
+    class="mt-10 text-5xl font-semibold tracking-tight text-balance text-ink-950 sm:text-6xl lg:mt-14 lg:text-7xl"
+  >
+    {data.name}
+  </h2>
+  {data.tagline && <p class="mt-5 max-w-2xl text-xl text-ink-600 sm:text-2xl">{data.tagline}</p>}
+  {data.taglineHi && (
+    <p lang="hi" class="mt-2 text-lg text-ink-500">
+      {data.taglineHi}
+    </p>
+  )}
+
+  <div class="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-12">
+    <div class="space-y-5 text-lg leading-8 text-pretty text-ink-700 lg:col-span-6">
+      {data.description.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
+    </div>
+    <div class="lg:col-span-5 lg:col-start-8">
+      <SpecSheet product={product} />
+    </div>
+  </div>
+
+  {data.features.length > 0 && <FeatureGroups productId={id} features={data.features} />}
+</article>

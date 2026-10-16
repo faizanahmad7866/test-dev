@@ -12,16 +12,22 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "check": "astro check",
+    "test": "vitest run",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "dev:functions": "astro build && wrangler pages dev",
+    "db:migrate:local": "wrangler d1 migrations apply dinar-leads --local"
   },
   "dependencies": {
+    "@lucide/astro": "^1.57.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20261015.1",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.13.0",
     "eslint-plugin-astro": "^3.2.1",
@@ -30,6 +36,8 @@
     "prettier-plugin-astro": "^1.1.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.2"
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.0"
   }
 }

@@ -4,7 +4,7 @@ import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  { ignores: ['dist/', '.astro/'] },
+  { ignores: ['dist/', '.astro/', '.wrangler/'] },
   js.configs.recommended,
   tseslint.configs.strict,
   astro.configs['flat/recommended'],

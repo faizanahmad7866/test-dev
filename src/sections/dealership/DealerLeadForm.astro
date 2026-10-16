@@ -1,0 +1,272 @@
+---
+/**
+ * Dealer enquiry form and its success panel. Field names match dealerLeadSchema exactly;
+ * src/scripts/dealer-lead-form.ts validates, submits and swaps the two.
+ */
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import ChoiceGroup from '@/components/forms/ChoiceGroup.astro';
+import FieldError from '@/components/forms/FieldError.astro';
+import FieldLabel from '@/components/forms/FieldLabel.astro';
+import FormStep from '@/components/forms/FormStep.astro';
+import SelectField from '@/components/forms/SelectField.astro';
+import TextField from '@/components/forms/TextField.astro';
+import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import type { Product } from '@/content.config';
+import { BUSINESS_TYPES, MONTHLY_VOLUMES, YEARS_IN_BUSINESS } from '@/data/dealer-form-options';
+import { INDIAN_STATES } from '@/data/indian-states';
+import { formatPhone } from '@/lib/format-phone';
+import { MESSAGE_MAX_LENGTH } from '@/lib/schemas/dealer-lead';
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+const supportPhone = formatPhone(site.supportPhone);
+const productChoices = products.map(({ id, data }) => ({
+  value: id,
+  label: data.name,
+  description: data.variants.map(({ label }) => label).join(' · '),
+  image: data.variants.find((variant) => variant.id === data.defaultVariant)?.image,
+}));
+const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state }));
+---
+
+<div
+  data-js="dealer-lead-card"
+  class="scroll-mt-28 rounded-3xl bg-white p-6 shadow-card ring-1 ring-ink-200 sm:p-10"
+>
+  <form
+    data-js="dealer-lead-form"
+    data-turnstile-site-key={PUBLIC_TURNSTILE_SITE_KEY}
+    data-support-phone={supportPhone}
+    aria-labelledby="dealer-form-title"
+    class="space-y-8"
+  >
+    <div>
+      <h2
+        id="dealer-form-title"
+        class="text-2xl font-extrabold tracking-tight text-navy-900 sm:text-3xl"
+      >
+        Dealer enquiry
+      </h2>
+      <p class="mt-2 text-sm text-ink-600">
+        Fields marked <span class="font-bold text-brand-700">*</span> are required.
+      </p>
+    </div>
+
+    <noscript>
+      <p class="rounded-2xl bg-mist-50 p-4 text-sm font-semibold text-navy-900 ring-1 ring-mist-200">
+        This form needs JavaScript to keep spam out. You can also call us on {supportPhone}.
+      </p>
+    </noscript>
+
+    <div
+      data-js="form-alert"
+      role="alert"
+      hidden
+      class="flex items-start gap-3 rounded-2xl bg-brand-50 p-4 text-sm font-semibold text-brand-900 ring-1 ring-brand-200"
+    >
+      <Icon name="circle-alert" class="mt-0.5 size-5 text-brand-700" />
+      <span data-alert-text></span>
+    </div>
+
+    <FormStep step={1} title="Your details" icon="user">
+      <TextField name="fullName" label="Full name" isRequired autocomplete="name" maxlength={80} />
+      <TextField
+        name="phone"
+        label="Mobile number"
+        type="tel"
+        prefix="+91"
+        isRequired
+        autocomplete="tel-national"
+        inputmode="tel"
+        maxlength={16}
+        hint="10-digit number. Our team will call you on this."
+      />
+      <TextField
+        name="email"
+        label="Email"
+        type="email"
+        isWide
+        autocomplete="email"
+        maxlength={120}
+      />
+    </FormStep>
+
+    <FormStep step={2} title="Your business" icon="store">
+      <TextField
+        name="businessName"
+        label="Shop or firm name"
+        isRequired
+        isWide
+        autocomplete="organization"
+        maxlength={120}
+      />
+      <ChoiceGroup
+        name="businessType"
+        legend="Business type"
+        type="radio"
+        options={BUSINESS_TYPES}
+        isRequired
+        columns={3}
+      />
+      <TextField
+        name="gstin"
+        label="GSTIN"
+        isUppercase
+        autocomplete="off"
+        maxlength={17}
+        placeholder="22AAAAA0000A1Z5"
+        hint="15 characters, from your GST certificate."
+      />
+      <SelectField
+        name="yearsInBusiness"
+        label="Years in business"
+        placeholder="Select"
+        options={YEARS_IN_BUSINESS}
+      />
+    </FormStep>
+
+    <FormStep step={3} title="Location" icon="map-pin">
+      <SelectField
+        name="state"
+        label="State"
+        placeholder="Select your state"
+        options={stateOptions}
+        isRequired
+        autocomplete="address-level1"
+      />
+      <TextField
+        name="city"
+        label="City or district"
+        isRequired
+        autocomplete="address-level2"
+        maxlength={80}
+      />
+      <TextField
+        name="pincode"
+        label="PIN code"
+        isRequired
+        autocomplete="postal-code"
+        inputmode="numeric"
+        maxlength={7}
+      />
+    </FormStep>
+
+    <FormStep step={4} title="Your requirement" icon="package">
+      <ChoiceGroup
+        name="products"
+        legend="Products you want to stock"
+        type="checkbox"
+        options={productChoices}
+        isRequired
+      />
+      <SelectField
+        name="monthlyVolume"
+        label="Expected monthly order"
+        placeholder="Select a range"
+        options={MONTHLY_VOLUMES}
+      />
+      <div class="sm:col-span-2">
+        <FieldLabel for="field-message" label="Message" isRequired={false} />
+        <textarea
+          id="field-message"
+          name="message"
+          rows="4"
+          maxlength={MESSAGE_MAX_LENGTH}
+          aria-describedby="field-message-count field-message-error"
+          placeholder="Anything we should know — areas you cover, a good time to call…"
+          class="mt-2 block w-full resize-y rounded-xl bg-white px-4 py-3 text-base text-navy-900 ring-1 ring-ink-300 transition-shadow placeholder:text-ink-500 hover:ring-ink-500 focus:ring-2 focus:ring-ocean-600 focus:outline-none aria-invalid:ring-2 aria-invalid:ring-brand-700 motion-reduce:transition-none"
+        ></textarea>
+        <p
+          id="field-message-count"
+          data-js="message-counter"
+          class="mt-1.5 text-right text-xs text-ink-500 tabular-nums"
+        >
+          0 / {MESSAGE_MAX_LENGTH.toLocaleString('en-IN')}
+        </p>
+        <FieldError id="field-message-error" name="message" />
+      </div>
+    </FormStep>
+
+    <div class="border-t border-ink-200 pt-8">
+      <label class="flex cursor-pointer items-start gap-3 rounded-2xl bg-mist-50 p-4 ring-1 ring-mist-200 has-aria-invalid:ring-2 has-aria-invalid:ring-brand-700">
+        <input
+          type="checkbox"
+          name="consent"
+          required
+          aria-describedby="field-consent-error"
+          class="mt-0.5 size-5 shrink-0 cursor-pointer accent-navy-900"
+        />
+        <span class="text-sm text-ink-700">
+          I agree that Dinar may contact me by phone, WhatsApp or email about this enquiry.
+          <span class="font-bold text-brand-700" aria-hidden="true">
+            *
+          </span>
+        </span>
+      </label>
+      <FieldError id="field-consent-error" name="consent" />
+    </div>
+
+    <div aria-hidden="true" class="sr-only">
+      <label for="field-website">Leave this field empty</label>
+      <input id="field-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div data-js="turnstile"></div>
+
+    <div class="flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
+      <p class="flex items-center gap-2 text-sm text-ink-500">
+        <Icon name="lock" class="size-4" />
+        Protected from spam by Cloudflare Turnstile.
+      </p>
+      <button
+        type="submit"
+        class="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-brand-700 px-8 text-base font-semibold text-white shadow-cta transition-colors hover:bg-brand-800 active:bg-brand-900 disabled:cursor-wait disabled:bg-brand-800 sm:w-auto motion-reduce:transition-none"
+      >
+        <span data-submit-label>Submit enquiry</span>
+        <Icon
+          name="loader-circle"
+          class="hidden size-5 animate-spin group-aria-busy:block motion-reduce:animate-none"
+        />
+        <ArrowIcon class="transition-transform group-hover:translate-x-0.5 group-aria-busy:hidden motion-reduce:transition-none" />
+      </button>
+    </div>
+  </form>
+
+  <div data-js="dealer-lead-success" hidden class="py-6 text-center text-navy-900 sm:py-10">
+    <span class="mx-auto grid size-16 place-items-center rounded-full bg-navy-50 ring-8 ring-mist-50">
+      <Icon name="circle-check" class="size-8" />
+    </span>
+    <h2
+      data-success-heading
+      tabindex="-1"
+      class="mt-6 text-2xl font-extrabold tracking-tight focus:outline-none sm:text-3xl"
+    >
+      Thank you — your enquiry is in
+    </h2>
+    <p class="mx-auto mt-3 max-w-md text-ink-600">
+      Our team will contact you on <strong data-success-phone class="text-navy-900"></strong>.
+    </p>
+    <div class="mx-auto mt-8 inline-flex flex-col items-center rounded-2xl bg-mist-50 px-8 py-4 ring-1 ring-mist-200">
+      <p class="text-xs font-bold tracking-widest text-ink-500 uppercase">Your reference</p>
+      <p data-success-reference class="mt-1 text-xl font-extrabold tracking-wider tabular-nums"></p>
+    </div>
+    <p class="mt-3 text-sm text-ink-500">Quote it if you call us on {supportPhone}.</p>
+    <div class="mt-8">
+      <Button href="/products/" variant="outline">
+        Explore products
+      </Button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initDealerLeadForm } from '@/scripts/dealer-lead-form';
+
+  initDealerLeadForm();
+</script>

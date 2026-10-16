@@ -1,0 +1,98 @@
+---
+/** Dealership hero: the page h1, how the enquiry process works, and the direct line. */
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { formatPhone } from '@/lib/format-phone';
+import type { IconName } from '@/lib/icon-names';
+
+const STEPS = [
+  {
+    icon: 'file-text',
+    title: 'Share your details',
+    description: 'Tell us about your business and the area you cover.',
+  },
+  {
+    icon: 'phone-call',
+    title: 'We get in touch',
+    description: 'The Dinar team reviews your enquiry and contacts you.',
+  },
+  {
+    icon: 'truck',
+    title: 'Start stocking Dinar',
+    description: 'Bring Super Wash and Detergent Cake to your customers.',
+  },
+] as const satisfies readonly { icon: IconName; title: string; description: string }[];
+---
+
+<section
+  aria-labelledby="dealership-title"
+  class="bg-hero relative isolate overflow-hidden text-white"
+>
+  <Container class="pt-8 pb-14 lg:pt-12 lg:pb-20">
+    <nav aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm text-white/70">
+        <li>
+          <a href="/" class="transition-colors hover:text-white">
+            Home
+          </a>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <a href="/dealership/" aria-current="page" class="font-semibold text-white">
+            Dealership
+          </a>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="mt-10 grid gap-12 lg:mt-12 lg:grid-cols-12 lg:items-end">
+      <div class="lg:col-span-6">
+        <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold tracking-widest uppercase ring-1 ring-white/15">
+          <span class="bg-rainbow size-2 rounded-full" aria-hidden="true"></span>
+          Dealers & distributors
+        </p>
+        <h1
+          id="dealership-title"
+          class="mt-6 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl xl:text-6xl"
+        >
+          Grow your business with Dinar
+        </h1>
+        <p class="mt-5 max-w-xl text-base text-pretty text-white/75 sm:text-lg">
+          Retailer, wholesaler or distributor — tell us about your business and the Dinar team will
+          get in touch about stocking our range.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <Button href="#enquiry" variant="light" size="lg">
+            Start your enquiry
+          </Button>
+          <a
+            href={`tel:${site.supportPhone}`}
+            class="inline-flex min-h-11 items-center gap-2 font-semibold text-white/90 transition-colors hover:text-white"
+          >
+            <Icon name="phone" class="size-4" />
+            {formatPhone(site.supportPhone)}
+          </a>
+        </div>
+      </div>
+
+      <ol class="grid gap-3 lg:col-span-6">
+        {STEPS.map(({ icon, title, description }, index) => (
+          <li class="flex items-start gap-4 rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
+            <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-white/10 text-sun-400">
+              <Icon name={icon} />
+            </span>
+            <div>
+              <p class="text-xs font-bold tracking-widest text-white/60 uppercase tabular-nums">
+                Step {String(index + 1).padStart(2, '0')}
+              </p>
+              <p class="mt-0.5 font-bold">{title}</p>
+              <p class="mt-1 text-sm text-white/70">{description}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </Container>
+</section>

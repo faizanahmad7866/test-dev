@@ -1,0 +1,78 @@
+---
+/**
+ * Labelled text input with optional prefix, hint and an error slot that form scripts fill.
+ * The input is described by both hint and error, so screen readers hear the fix with the field.
+ */
+import type { HTMLAttributes } from 'astro/types';
+import FieldError from '@/components/forms/FieldError.astro';
+import FieldLabel from '@/components/forms/FieldLabel.astro';
+
+interface Props {
+  name: string;
+  label: string;
+  type?: 'text' | 'tel' | 'email';
+  isRequired?: boolean;
+  isWide?: boolean;
+  isUppercase?: boolean;
+  autocomplete?: HTMLAttributes<'input'>['autocomplete'];
+  inputmode?: HTMLAttributes<'input'>['inputmode'];
+  maxlength?: number;
+  placeholder?: string;
+  prefix?: string;
+  hint?: string;
+}
+
+const {
+  name,
+  label,
+  type = 'text',
+  isRequired = false,
+  isWide = false,
+  isUppercase = false,
+  autocomplete,
+  inputmode,
+  maxlength,
+  placeholder,
+  prefix,
+  hint,
+} = Astro.props;
+
+const id = `field-${name}`;
+const hintId = `${id}-hint`;
+const errorId = `${id}-error`;
+---
+
+<div class:list={[isWide && 'sm:col-span-2']}>
+  <FieldLabel for={id} label={label} isRequired={isRequired} />
+  <div class="mt-2 flex overflow-hidden rounded-xl bg-white ring-1 ring-ink-300 transition-shadow focus-within:ring-2 focus-within:ring-ocean-600 hover:ring-ink-500 has-aria-invalid:ring-2 has-aria-invalid:ring-brand-700 motion-reduce:transition-none">
+    {prefix && (
+      <span
+        class="flex items-center border-r border-ink-200 bg-ink-50 px-3.5 text-sm font-semibold text-ink-600"
+        aria-hidden="true"
+      >
+        {prefix}
+      </span>
+    )}
+    <input
+      id={id}
+      name={name}
+      type={type}
+      required={isRequired}
+      autocomplete={autocomplete}
+      inputmode={inputmode}
+      maxlength={maxlength}
+      placeholder={placeholder}
+      aria-describedby={hint ? `${hintId} ${errorId}` : errorId}
+      class:list={[
+        'h-12 w-full min-w-0 bg-transparent px-4 text-base text-navy-900 placeholder:text-ink-500 focus:outline-none',
+        isUppercase && 'uppercase placeholder:normal-case',
+      ]}
+    />
+  </div>
+  {hint && (
+    <p id={hintId} class="mt-1.5 text-sm text-ink-500">
+      {hint}
+    </p>
+  )}
+  <FieldError id={errorId} name={name} />
+</div>

@@ -1,0 +1,7 @@
+# Server-side secrets for Pages Functions. Copy to .dev.vars for local dev;
+# in production set them in Cloudflare Pages → Settings → Variables and Secrets.
+# Cloudflare's always-pass Turnstile test secret: 1x0000000000000000000000000000000AA
+TURNSTILE_SECRET_KEY=
+RESEND_API_KEY=
+LEADS_EMAIL_FROM=
+LEADS_EMAIL_TO=

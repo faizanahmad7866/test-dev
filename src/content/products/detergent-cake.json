@@ -1,0 +1,23 @@
+{
+  "order": 2,
+  "name": "Dinar Detergent Cake",
+  "category": "Detergent cake",
+  "categoryHi": "डिटर्जेंट केक",
+  "tagline": "With lemon powder, for extra brightness.",
+  "description": [
+    "Dinar Detergent Cake is a detergent bar made with lemon powder. It brings extra brightness to everyday laundry and comes in a 200 g pack."
+  ],
+  "format": "Cake",
+  "highlights": ["With Lemon Powder", "Extra Brightness"],
+  "defaultVariant": "200g",
+  "variants": [
+    {
+      "id": "200g",
+      "label": "200 g",
+      "pack": "Wrapped cake",
+      "mrp": 10,
+      "image": "../../assets/products/detergent-cake/200g.png",
+      "imageAlt": "Dinar Detergent Cake 200 g pack with lemon powder"
+    }
+  ]
+}

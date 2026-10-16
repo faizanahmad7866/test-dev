@@ -1,0 +1,33 @@
+---
+/** A product family's shared facts as a spec table. Per-pack facts and MRPs live in the product list. */
+import type { Product } from '@/content.config';
+
+interface Props {
+  product: Product;
+}
+
+const { data } = Astro.props.product;
+const rows = [
+  { label: 'Format', value: data.format },
+  ...(data.suitableFor ? [{ label: 'Suitable for', value: data.suitableFor }] : []),
+  { label: 'Pack sizes', value: data.variants.map(({ label }) => label).join(' · ') },
+  { label: 'On the pack', value: data.highlights.join(' · ') },
+];
+---
+
+<div>
+  <h3 class="flex items-baseline gap-3 text-sm font-medium text-ink-950">
+    Specifications{' '}
+    <span lang="hi" class="font-normal text-ink-500">
+      विवरण
+    </span>
+  </h3>
+  <dl class="mt-4 border-t border-ink-950 text-sm">
+    {rows.map(({ label, value }) => (
+      <div class="grid grid-cols-3 gap-4 border-b border-ink-200 py-3.5">
+        <dt class="text-ink-500">{label}</dt>
+        <dd class="col-span-2 text-ink-950">{value}</dd>
+      </div>
+    ))}
+  </dl>
+</div>

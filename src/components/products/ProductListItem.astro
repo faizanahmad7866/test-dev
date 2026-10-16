@@ -1,0 +1,99 @@
+---
+/**
+ * One pack presented as a product in its own right: a large studio shot beside its name,
+ * net quantity set as display type, and a spec table ending in the MRP as the pack prints it.
+ * Alternate items mirror the layout so the list reads like spreads, not a shop grid.
+ */
+import { Image } from 'astro:assets';
+import type { Product, ProductVariant } from '@/content.config';
+import { formatMrp } from '@/lib/format-mrp';
+
+interface Props {
+  product: Product;
+  variant: ProductVariant;
+  position: number;
+  total: number;
+}
+
+const { product, variant, position, total } = Astro.props;
+const { id: productId, data } = product;
+const itemId = `${productId}-${variant.id}`;
+const headingId = `${itemId}-title`;
+const isMirrored = position % 2 === 0;
+const isLandscape = variant.image.width > variant.image.height;
+const counter = (value: number) => String(value).padStart(2, '0');
+
+const specs = [
+  { label: 'Net quantity', value: variant.label },
+  { label: 'Pack', value: variant.pack },
+  { label: 'Format', value: data.format },
+  ...(data.suitableFor ? [{ label: 'Suitable for', value: data.suitableFor }] : []),
+];
+---
+
+<article
+  id={itemId}
+  aria-labelledby={headingId}
+  class="grid scroll-mt-24 items-center gap-10 border-t border-ink-200 py-14 first:border-t-0 lg:grid-cols-12 lg:gap-16 lg:py-20"
+>
+  <div class:list={['lg:col-span-6', isMirrored && 'lg:col-start-7 lg:row-start-1']}>
+    <div
+      class:list={[
+        'bg-stage relative flex items-center justify-center overflow-hidden p-6 sm:p-12',
+        isLandscape ? 'aspect-wide' : 'aspect-square',
+      ]}
+    >
+      {/* The image box hugs the photo itself, so the edge fade lands on the photo's own
+          backdrop and blends it into the stage instead of leaving a visible rectangle. */}
+      <Image
+        src={variant.image}
+        alt={variant.imageAlt}
+        widths={[480, 720, 960, 1200]}
+        sizes="(min-width: 1280px) 584px, (min-width: 1024px) 46vw, 100vw"
+        class="h-auto max-h-full w-auto max-w-full mask-x-from-85% mask-y-from-85%"
+      />
+    </div>
+  </div>
+
+  <div
+    class:list={['lg:col-span-5', isMirrored ? 'lg:col-start-1 lg:row-start-1' : 'lg:col-start-8']}
+  >
+    <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+      <span class="font-mono text-ink-500">
+        {counter(position)} / {counter(total)}
+      </span>
+      <span class="font-medium text-ink-950">{data.category}</span>
+      <span lang="hi" class="text-ink-500">
+        {data.categoryHi}
+      </span>
+    </p>
+
+    <h3 id={headingId} class="mt-6 text-4xl font-semibold tracking-tight text-ink-950 sm:text-5xl">
+      {data.name} <span class="mt-1 block font-light text-ink-500">{variant.label}</span>
+    </h3>
+
+    <dl class="mt-10 border-t border-ink-950 text-sm">
+      {specs.map(({ label, value }) => (
+        <div class="grid grid-cols-3 gap-4 border-b border-ink-200 py-3.5">
+          <dt class="text-ink-500">{label}</dt>
+          <dd class="col-span-2 text-ink-950">{value}</dd>
+        </div>
+      ))}
+      <div class="grid grid-cols-3 items-baseline gap-4 border-b border-ink-200 py-4">
+        <dt class="text-ink-500">MRP</dt>
+        <dd class="col-span-2">
+          <span class="font-mono text-2xl text-ink-950">{formatMrp(variant.mrp)}</span>
+          <span class="mt-1 block text-xs text-ink-500">Inclusive of all taxes</span>
+        </dd>
+      </div>
+    </dl>
+
+    <a
+      href={`#${productId}`}
+      class="mt-8 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-ink-950 underline decoration-ink-300 underline-offset-4 transition-colors hover:decoration-ink-950"
+    >
+      About {data.name}
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>

@@ -1,0 +1,98 @@
+---
+/**
+ * Home hero built around the product film. Phones read headline → film; from lg the film
+ * leads edge to edge and the headline rises into its faded lower edge, like a title card.
+ * The h1 stays first in the DOM either way, so reading order never changes.
+ * The poster is a real responsive <img> (the LCP element, preloaded by the page); the silent
+ * loop fades in over it once playing.
+ */
+import type { GetImageResult } from 'astro';
+import heroMp4Large from '@/assets/video/dinar-hero-1080.mp4';
+import heroWebmLarge from '@/assets/video/dinar-hero-1080.webm';
+import heroMp4Small from '@/assets/video/dinar-hero-720.mp4';
+import heroWebmSmall from '@/assets/video/dinar-hero-720.webm';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { headerCta } from '@/config/navigation';
+import { site } from '@/config/site';
+
+interface Props {
+  poster: GetImageResult;
+  sizes: string;
+}
+
+const { poster, sizes } = Astro.props;
+// Phones get the 720p cut. Exact codecs let a browser without AV1 skip straight to MP4.
+const SMALL_SCREEN = '(max-width: 767px)';
+---
+
+<section
+  aria-labelledby="home-title"
+  class="bg-hero relative isolate flex flex-col overflow-hidden text-white"
+>
+  <Container class="relative z-10 pt-14 text-center sm:pt-20 lg:order-last lg:-mt-20 lg:pt-0 lg:pb-24">
+    <p class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold tracking-widest uppercase ring-1 ring-white/15">
+      <span class="bg-rainbow size-2 rounded-full" aria-hidden="true"></span>
+      {site.name}
+    </p>
+    <h1
+      id="home-title"
+      class="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight text-balance sm:text-6xl lg:text-7xl"
+    >
+      Freshness and brilliance after every wash.
+    </h1>
+    <p lang="hi" class="mt-5 text-xl font-semibold text-sun-400 sm:text-2xl">
+      हर Wash के बाद Freshness और Brilliance!
+    </p>
+    <p class="mx-auto mt-4 max-w-xl text-base text-pretty text-white/75 sm:text-lg">
+      Dinar Super Wash and Dinar Detergent Cake. {site.tagline}
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button href="/products/" variant="light" size="lg">
+        Explore products
+      </Button>
+      <Button href={headerCta.href} size="lg">
+        {headerCta.label}
+      </Button>
+    </div>
+  </Container>
+
+  <div class="relative mx-auto mt-10 aspect-video max-h-svh w-full mb-8 max-w-cinema mask-x-from-90% mask-t-from-90% mask-b-from-75% sm:mt-14 lg:mt-0 lg:mb-0 lg:mask-x-from-95% lg:mask-t-from-100% lg:mask-b-from-60%">
+    {/* getImage + <img> rather than <Picture>: the same srcset must also feed the head preload. */}
+    <img
+      src={poster.src}
+      srcset={poster.srcSet.attribute}
+      sizes={sizes}
+      width={poster.attributes['width']}
+      height={poster.attributes['height']}
+      alt="Dinar Super Wash, Detergent Powder and Detergent Cake packs among soap bubbles and splashes"
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      class="absolute inset-0 size-full object-cover"
+    />
+    <video
+      data-js="hero-video"
+      muted
+      loop
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      disableRemotePlayback
+      aria-hidden="true"
+      tabindex="-1"
+      class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-700 data-playing:opacity-100"
+    >
+      <source src={heroWebmSmall} type='video/webm; codecs="av01.0.05M.08"' media={SMALL_SCREEN} />
+      <source src={heroMp4Small} type='video/mp4; codecs="avc1.64001F"' media={SMALL_SCREEN} />
+      <source src={heroWebmLarge} type='video/webm; codecs="av01.0.08M.08"' />
+      <source src={heroMp4Large} type='video/mp4; codecs="avc1.640032"' />
+    </video>
+  </div>
+</section>
+
+<script>
+  import { initHeroVideo } from '@/scripts/hero-video';
+
+  initHeroVideo();
+</script>

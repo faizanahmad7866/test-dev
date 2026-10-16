@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import DealerEnquirySection from '@/sections/dealership/DealerEnquirySection.astro';
+import DealershipHeroSection from '@/sections/dealership/DealershipHeroSection.astro';
+
+const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+const pageUrl = new URL(Astro.url.pathname, site.url).href;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', site.url).href },
+    { '@type': 'ListItem', position: 2, name: 'Dealership', item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout
+  title="Become a Dealer"
+  description="Apply to become a Dinar dealer or distributor. Share your business details and the Dinar team will contact you about stocking our detergents."
+  schema={schema}
+>
+  <DealershipHeroSection />
+  <DealerEnquirySection products={products} />
+</BaseLayout>

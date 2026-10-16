@@ -1,0 +1,104 @@
+{
+  "order": 1,
+  "name": "Dinar Super Wash",
+  "category": "Detergent powder",
+  "categoryHi": "डिटर्जेंट पाउडर",
+  "tagline": "A clean you can see, a fragrance that stays.",
+  "taglineHi": "सफ़ाई जो दिखे, ख़ुशबू जो महके।",
+  "description": [
+    "Dinar Super Wash is a multi-action detergent powder for everyday laundry. Its cleaning enzymes break down stains, the rich foam carries dirt out of the fabric, and the powder dissolves quickly, whether you wash by hand or in a machine.",
+    "It is gentle on fabric and on colour, rinses out with less water and leaves no residue behind. Whites come out brighter, colours stay true, and the fragrance lasts well after the wash."
+  ],
+  "format": "Powder",
+  "suitableFor": "Hand wash and machine wash",
+  "highlights": ["Multi Action Formula", "Keep-it Clean Enzymes", "Extra Brightness"],
+  "defaultVariant": "1kg",
+  "variants": [
+    {
+      "id": "500g",
+      "label": "500 g",
+      "pack": "Pouch",
+      "mrp": 46,
+      "image": "../../assets/products/super-wash/500g.png",
+      "imageAlt": "Dinar detergent powder 500 g pouch"
+    },
+    {
+      "id": "1kg",
+      "label": "1 kg",
+      "pack": "Pouch",
+      "mrp": 89,
+      "image": "../../assets/products/super-wash/1kg.png",
+      "imageAlt": "Dinar detergent powder 1 kg pouch"
+    },
+    {
+      "id": "5kg",
+      "label": "5 kg",
+      "pack": "Bag",
+      "mrp": 499,
+      "image": "../../assets/products/super-wash/5kg.png",
+      "imageAlt": "Dinar Super Wash 5 kg bag"
+    }
+  ],
+  "features": [
+    {
+      "group": "cleaning",
+      "title": "Multi Action Formula",
+      "description": "Reaches deep into the fabric to clean out everyday dirt."
+    },
+    {
+      "group": "cleaning",
+      "title": "Cleaning enzymes",
+      "description": "Break stains down so they wash out easily."
+    },
+    {
+      "group": "cleaning",
+      "title": "Tough stain removal",
+      "description": "Clears stubborn stains at the root."
+    },
+    {
+      "group": "cleaning",
+      "title": "Rich foam",
+      "description": "More lather for a thorough wash."
+    },
+    {
+      "group": "care",
+      "title": "Extra brightness",
+      "description": "Gives clothes their shine and whiteness."
+    },
+    {
+      "group": "care",
+      "title": "Colour care",
+      "description": "Helps clothes keep their colour."
+    },
+    {
+      "group": "care",
+      "title": "Gentle on fabric",
+      "description": "Keeps clothes soft and safe."
+    },
+    {
+      "group": "care",
+      "title": "Low residue",
+      "description": "Leaves nothing behind on clothes."
+    },
+    {
+      "group": "everyday",
+      "title": "Quick dissolving",
+      "description": "Dissolves fast in water, with nothing left over."
+    },
+    {
+      "group": "everyday",
+      "title": "Easy rinse",
+      "description": "Rinses clean, even with less water."
+    },
+    {
+      "group": "everyday",
+      "title": "Hand and machine wash",
+      "description": "One powder for every kind of wash."
+    },
+    {
+      "group": "everyday",
+      "title": "Long-lasting fragrance",
+      "description": "Clothes stay fresh after the wash."
+    }
+  ]
+}

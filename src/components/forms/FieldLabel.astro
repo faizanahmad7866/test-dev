@@ -1,0 +1,25 @@
+---
+/** Field label with a required star or an "Optional" tag, so every field states which it is. */
+interface Props {
+  for: string;
+  label: string;
+  isRequired: boolean;
+}
+
+const { for: htmlFor, label, isRequired } = Astro.props;
+---
+
+<label
+  for={htmlFor}
+  class="flex items-baseline justify-between gap-3 text-sm font-semibold text-navy-900"
+>
+  <span>
+    {label}
+    {isRequired && (
+      <span class="ml-0.5 text-brand-700" aria-hidden="true">
+        *
+      </span>
+    )}
+  </span>
+  {!isRequired && <span class="text-xs font-medium text-ink-500">Optional</span>}
+</label>

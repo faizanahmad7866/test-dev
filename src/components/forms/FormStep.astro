@@ -1,0 +1,33 @@
+---
+/** One numbered part of a long form ("Step 01 · Your details") with a two-column field grid. */
+import Icon from '@/components/ui/Icon.astro';
+import type { IconName } from '@/lib/icon-names';
+
+interface Props {
+  step: number;
+  title: string;
+  icon: IconName;
+}
+
+const { step, title, icon } = Astro.props;
+const headingId = `form-step-${step}`;
+---
+
+<section aria-labelledby={headingId} class="border-t border-ink-200 pt-8">
+  <div class="flex items-center gap-4">
+    <span class="grid size-11 place-items-center rounded-xl bg-navy-50 text-navy-700">
+      <Icon name={icon} />
+    </span>
+    <div>
+      <p class="text-xs font-bold tracking-widest text-brand-700 uppercase tabular-nums">
+        Step {String(step).padStart(2, '0')}
+      </p>
+      <h3 id={headingId} class="text-lg font-extrabold tracking-tight text-navy-900">
+        {title}
+      </h3>
+    </div>
+  </div>
+  <div class="mt-6 grid gap-x-5 gap-y-6 sm:grid-cols-2">
+    <slot />
+  </div>
+</section>
