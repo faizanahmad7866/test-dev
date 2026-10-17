@@ -1,0 +1,75 @@
+---
+/**
+ * Back cover: the slogans, every way to reach the company, a QR code to the website, and the
+ * brand with its parent company. The last thing a dealer sees, and what they keep.
+ */
+import { Image } from 'astro:assets';
+import logo from '@/assets/brand/dinar-logo.png';
+import wordmark from '@/assets/brand/dinar-hi-dena.png';
+import Sheet from '@/components/catalogue/Sheet.astro';
+import CompanyLogo from '@/components/layout/CompanyLogo.astro';
+import { site } from '@/config/site';
+import { formatAddress } from '@/lib/format-address';
+import { formatPhone } from '@/lib/format-phone';
+import { qrCodeSvg } from '@/lib/qr-code';
+
+interface Props {
+  edition: string;
+}
+
+const { edition } = Astro.props;
+const host = new URL(site.url).host;
+const qr = await qrCodeSvg(site.url);
+const contacts = [
+  { label: 'Helpline', value: formatPhone(site.supportPhone) },
+  { label: 'Email', value: site.email },
+  { label: 'Website', value: host },
+  { label: 'Office', value: `${site.company.legalName}, ${formatAddress(site.company.office)}` },
+];
+---
+
+<Sheet bare>
+  <div class="flex h-full flex-col">
+    <div class="flex flex-1 flex-col items-center justify-center px-12 text-center">
+      <Image
+        src={wordmark}
+        alt={site.slogans.hi}
+        lang="hi"
+        widths={[560]}
+        sizes="280px"
+        class="h-40 w-auto"
+      />
+      <p class="mt-6 text-3xl font-bold tracking-tight text-navy-900">{site.slogans.en}</p>
+    </div>
+
+    <div class="bg-navy-900 px-12 py-12 text-white">
+      <h2 class="text-3xl font-bold tracking-tight">Get in touch</h2>
+      <div class="mt-8 flex items-start gap-10">
+        <dl class="grid flex-1 grid-cols-2 gap-x-8 gap-y-6">
+          {contacts.map(({ label, value }) => (
+            <div>
+              <dt class="text-sm text-white/60">{label}</dt>
+              <dd class="mt-1 text-lg font-bold">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <div class="text-center">
+          <div class="qr size-32 rounded-xl bg-white p-3 text-navy-900" set:html={qr} />
+          <p class="mt-2 text-xs text-white/70">Scan to visit {host}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between px-12 py-8">
+      <Image src={logo} alt={site.name} widths={[128, 256]} sizes="128px" class="h-14 w-auto" />
+      <div class="flex items-center gap-4">
+        <span class="text-xs font-semibold tracking-wide text-ink-500 uppercase">A brand of</span>
+        <CompanyLogo size="sm" />
+      </div>
+      <p class="text-right text-xs leading-5 text-ink-500">
+        Product Catalogue · {edition}
+        <span class="block">MRP inclusive of all taxes.</span>
+      </p>
+    </div>
+  </div>
+</Sheet>

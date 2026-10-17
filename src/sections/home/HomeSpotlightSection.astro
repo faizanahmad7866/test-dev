@@ -1,0 +1,88 @@
+---
+/**
+ * One product in focus: its pack large on the studio backdrop, and beside it the name, the
+ * promise and the first benefits as a checklist, leading to the product's own page.
+ */
+import { Image } from 'astro:assets';
+import CheckList from '@/components/products/CheckList.astro';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { packPhotoFit } from '@/lib/pack-photo';
+import { skuPath, type ProductSku } from '@/lib/product-skus';
+
+interface Props {
+  sku: ProductSku;
+}
+
+const SPOTLIGHT_BENEFITS = 4;
+
+const { sku } = Astro.props;
+const { product, variant } = sku;
+const { data } = product;
+// Benefits read best here; a product without them falls back to its feature names.
+const points = (
+  data.benefits.length > 0 ? data.benefits : data.features.map(({ title }) => title)
+).slice(0, SPOTLIGHT_BENEFITS);
+// Every size the product is sold in, including those not yet on the site.
+const packList = new Intl.ListFormat('en-IN', { type: 'conjunction' }).format([
+  ...data.alsoPackedIn,
+  ...data.variants.map(({ label }) => label),
+]);
+---
+
+<section aria-labelledby="spotlight-title" class="py-14 lg:py-20">
+  <Container class="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
+    <div class="reveal lg:col-span-6">
+      <div class="bg-stage flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-10 sm:p-16">
+        <Image
+          src={variant.image}
+          alt={variant.imageAlt}
+          widths={[480, 720, 960, 1200]}
+          sizes="(min-width: 1280px) 584px, (min-width: 1024px) 46vw, 100vw"
+          class:list={['h-auto w-auto mask-x-from-85% mask-y-from-85%', packPhotoFit(variant)]}
+        />
+      </div>
+    </div>
+
+    <div class="reveal lg:col-span-6">
+      <p class="font-semibold text-brand-700">{data.category}</p>
+      <h2
+        id="spotlight-title"
+        class="mt-2 text-3xl font-bold tracking-tight text-navy-900 sm:text-5xl"
+      >
+        {data.name}
+      </h2>
+      {data.tagline && (
+        <p class="mt-4 text-xl font-semibold text-pretty text-brand-700 sm:text-2xl">
+          {data.tagline}
+        </p>
+      )}
+      {data.taglineHi && (
+        <p lang="hi" class="mt-1 text-lg text-ink-600">
+          {data.taglineHi}
+        </p>
+      )}
+
+      <div class="mt-8">
+        <CheckList items={points} columns={2} />
+      </div>
+
+      <p class="mt-8 text-ink-600">Packed in {packList}.</p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        {variant.onlineOrder && (
+          <Button href={`${skuPath(sku)}#order`} size="lg">
+            Shop now
+          </Button>
+        )}
+        <Button
+          href={skuPath(sku)}
+          variant={variant.onlineOrder ? 'outline' : 'navy'}
+          size="lg"
+          class={variant.onlineOrder ? 'text-navy-900' : ''}
+        >
+          Explore {data.name}
+        </Button>
+      </div>
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,30 @@
+---
+/**
+ * Link to the printed product catalogue, with its file type and size so visitors on mobile
+ * data know what they are about to download. Colour comes from the surrounding text.
+ */
+import Icon from '@/components/ui/Icon.astro';
+import { getCatalogueDownload } from '@/lib/catalogue';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const { href, label } = getCatalogueDownload();
+---
+
+<a
+  href={href}
+  download
+  type="application/pdf"
+  class:list={[
+    'group inline-flex min-h-11 items-center gap-2 font-bold transition-colors',
+    className,
+  ]}
+>
+  <Icon name="download" class="size-4" />
+  <span>
+    Download product catalogue <span class="font-medium opacity-70">({label})</span>
+  </span>
+</a>

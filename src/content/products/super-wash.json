@@ -6,48 +6,39 @@
   "tagline": "A clean you can see, a fragrance that stays.",
   "taglineHi": "सफ़ाई जो दिखे, ख़ुशबू जो महके।",
   "description": [
-    "Dinar Super Wash is a multi-action detergent powder for everyday laundry. Its cleaning enzymes break down stains, the rich foam carries dirt out of the fabric, and the powder dissolves quickly, whether you wash by hand or in a machine.",
-    "It is gentle on fabric and on colour, rinses out with less water and leaves no residue behind. Whites come out brighter, colours stay true, and the fragrance lasts well after the wash."
+    "Dinar Super Wash is a multi-action detergent powder for everyday family laundry. Its Keep-it-Clean enzymes break down tough stains, rich foam carries dirt out of the fabric, and the powder dissolves quickly, whether you wash by hand or in a machine.",
+    "It is gentle on fabrics and helps them keep their colour, rinses out with less residue, and leaves clothes fresh and fragrant. Whites come out brighter, wash after wash."
   ],
   "format": "Powder",
   "suitableFor": "Hand wash and machine wash",
-  "highlights": ["Multi Action Formula", "Keep-it Clean Enzymes", "Extra Brightness"],
-  "defaultVariant": "1kg",
+  "highlights": ["Multi Action Formula", "Extra Brightness", "Effective Keep-it-Clean Enzymes"],
+  "shelfLife": "24 months from packing",
+  "alsoPackedIn": ["110 g", "500 g", "1 kg"],
+  "packBack": {
+    "image": "../../assets/products/shared/powder-pack-back.png",
+    "alt": "Back of the Dinar detergent powder pack, showing the usage steps, best-before period, manufacturer and customer care details"
+  },
+  "defaultVariant": "5kg",
   "variants": [
-    {
-      "id": "500g",
-      "label": "500 g",
-      "pack": "Pouch",
-      "mrp": 46,
-      "image": "../../assets/products/super-wash/500g.png",
-      "imageAlt": "Dinar detergent powder 500 g pouch"
-    },
-    {
-      "id": "1kg",
-      "label": "1 kg",
-      "pack": "Pouch",
-      "mrp": 89,
-      "image": "../../assets/products/super-wash/1kg.png",
-      "imageAlt": "Dinar detergent powder 1 kg pouch"
-    },
     {
       "id": "5kg",
       "label": "5 kg",
       "pack": "Bag",
-      "mrp": 499,
+      "mrp": 399,
       "image": "../../assets/products/super-wash/5kg.png",
-      "imageAlt": "Dinar Super Wash 5 kg bag"
+      "imageAlt": "Dinar Super Wash 5 kg bag",
+      "onlineOrder": true
     }
   ],
   "features": [
     {
       "group": "cleaning",
-      "title": "Multi Action Formula",
-      "description": "Reaches deep into the fabric to clean out everyday dirt."
+      "title": "Powerful Multi Action Formula",
+      "description": "Reaches deep into the fabric to clean out every kind of dirt."
     },
     {
       "group": "cleaning",
-      "title": "Cleaning enzymes",
+      "title": "Effective cleaning enzymes",
       "description": "Break stains down so they wash out easily."
     },
     {
@@ -57,7 +48,7 @@
     },
     {
       "group": "cleaning",
-      "title": "Rich foam",
+      "title": "Rich foam technology",
       "description": "More lather for a thorough wash."
     },
     {
@@ -67,22 +58,22 @@
     },
     {
       "group": "care",
-      "title": "Colour care",
+      "title": "Colour care technology",
       "description": "Helps clothes keep their colour."
     },
     {
       "group": "care",
-      "title": "Gentle on fabric",
+      "title": "Gentle on fabrics",
       "description": "Keeps clothes soft and safe."
     },
     {
       "group": "care",
-      "title": "Low residue",
+      "title": "Low residue formula",
       "description": "Leaves nothing behind on clothes."
     },
     {
       "group": "everyday",
-      "title": "Quick dissolving",
+      "title": "Quick dissolving formula",
       "description": "Dissolves fast in water, with nothing left over."
     },
     {
@@ -92,13 +83,45 @@
     },
     {
       "group": "everyday",
-      "title": "Hand and machine wash",
+      "title": "Suitable for hand and machine wash",
       "description": "One powder for every kind of wash."
     },
     {
       "group": "everyday",
-      "title": "Long-lasting fragrance",
+      "title": "Long-lasting fresh fragrance",
       "description": "Clothes stay fresh after the wash."
+    }
+  ],
+  "benefits": [
+    "Removes tough stains quickly",
+    "Keeps white clothes brighter",
+    "Helps retain fabric colours",
+    "Leaves clothes fresh and fragrant",
+    "Easy rinse with less residue",
+    "Ideal for daily family use",
+    "Economical and value for money",
+    "Reliable cleaning performance"
+  ],
+  "howToUse": [
+    {
+      "en": "Add two full spoons of detergent powder to water.",
+      "hi": "पानी में दो चम्मच डिटर्जेंट पाउडर मिलाएं।",
+      "image": "../../assets/products/usage/use-01.png"
+    },
+    {
+      "en": "Soak the clothes for 30 minutes.",
+      "hi": "कपड़ों को 30 मिनट तक भिगो कर रखें।",
+      "image": "../../assets/products/usage/use-02.png"
+    },
+    {
+      "en": "Wash the clothes properly.",
+      "hi": "कपड़ों को धोएं।",
+      "image": "../../assets/products/usage/use-03.png"
+    },
+    {
+      "en": "Dry the clothes.",
+      "image": "../../assets/products/usage/use-04.png",
+      "hi": "कपड़ों को सुखाएं।"
     }
   ]
 }

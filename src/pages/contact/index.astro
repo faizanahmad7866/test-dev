@@ -1,0 +1,36 @@
+---
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatPhone } from '@/lib/format-phone';
+import { buildOrganizationNode } from '@/lib/schema/organization-schema';
+import ContactSection from '@/sections/contact/ContactSection.astro';
+
+const pageUrl = new URL(Astro.url.pathname, site.url).href;
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ContactPage',
+      url: pageUrl,
+      name: `Contact ${site.name}`,
+      about: { '@id': new URL('/#organization', site.url).href },
+    },
+    await buildOrganizationNode(site.url),
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', site.url).href },
+        { '@type': 'ListItem', position: 2, name: 'Contact', item: pageUrl },
+      ],
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title="Contact Us"
+  description={`Contact ${site.name}: call ${formatPhone(site.supportPhone)}, email ${site.email}, or visit ${site.company.legalName} in ${site.company.office.locality}, ${site.company.office.region}.`}
+  schema={schema}
+>
+  <ContactSection />
+</BaseLayout>

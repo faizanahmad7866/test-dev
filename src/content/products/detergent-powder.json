@@ -1,0 +1,92 @@
+{
+  "order": 2,
+  "name": "Dinar Detergent Powder",
+  "category": "Detergent powder",
+  "categoryHi": "डिटर्जेंट पाउडर",
+  "tagline": "Safe for family, tough on stains.",
+  "taglineHi": "ख़ुशबू भी, सफ़ाई भी!",
+  "description": [
+    "Dinar Detergent Powder is the family's everyday washing partner. It cleans deep for everyday freshness, removes tough stains easily, and keeps whites bright and colours vibrant.",
+    "From school uniforms to the family's daily wear, clothes come out clean, bright and ready, with a fragrance that lasts."
+  ],
+  "format": "Powder",
+  "highlights": ["Effective Keep-it-Clean Enzymes", "Multi Action Formula", "Extra Brightness"],
+  "shelfLife": "24 months from packing",
+  "packBack": {
+    "image": "../../assets/products/shared/powder-pack-back.png",
+    "alt": "Back of the Dinar detergent powder pack, showing the usage steps, best-before period, manufacturer and customer care details"
+  },
+  "defaultVariant": "1kg",
+  "variants": [
+    {
+      "id": "80g",
+      "label": "80 g",
+      "pack": "Pouch",
+      "mrp": 10,
+      "image": "../../assets/products/detergent-powder/500g.png",
+      "imageAlt": "Dinar Detergent Powder pouch",
+      "photoSize": "small"
+    },
+    {
+      "id": "500g",
+      "label": "500 g",
+      "pack": "Pouch",
+      "mrp": 46,
+      "image": "../../assets/products/detergent-powder/500g.png",
+      "imageAlt": "Dinar Detergent Powder 500 g pouch"
+    },
+    {
+      "id": "1kg",
+      "label": "1 kg",
+      "pack": "Pouch",
+      "mrp": 89,
+      "image": "../../assets/products/detergent-powder/1kg.png",
+      "imageAlt": "Dinar Detergent Powder 1 kg pouch",
+      "onlineOrder": true
+    }
+  ],
+  "features": [
+    {
+      "group": "cleaning",
+      "title": "Super clean",
+      "description": "Deep clean for everyday freshness."
+    },
+    {
+      "group": "cleaning",
+      "title": "Tough on stains",
+      "description": "Removes tough stains easily."
+    },
+    {
+      "group": "care",
+      "title": "Bright whites and vibrant colours",
+      "description": "Keeps clothes bright and new."
+    },
+    {
+      "group": "everyday",
+      "title": "Long-lasting fragrance",
+      "description": "Long-lasting freshness after the wash."
+    }
+  ],
+  "howToUse": [
+    {
+      "en": "Add two full spoons of detergent powder to water.",
+      "hi": "पानी में दो चम्मच डिटर्जेंट पाउडर मिलाएं।",
+      "image": "../../assets/products/usage/use-01.png"
+    },
+    {
+      "en": "Soak the clothes for 30 minutes.",
+      "hi": "कपड़ों को 30 मिनट तक भिगो कर रखें।",
+      "image": "../../assets/products/usage/use-02.png"
+    },
+    {
+      "en": "Wash the clothes properly.",
+      "hi": "कपड़ों को धोएं।",
+      "image": "../../assets/products/usage/use-03.png"
+    },
+    {
+      "en": "Dry the clothes.",
+      "image": "../../assets/products/usage/use-04.png",
+      "hi": "कपड़ों को सुखाएं।"
+    }
+  ]
+}

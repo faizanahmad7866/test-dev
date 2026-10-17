@@ -47,5 +47,8 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    // Pre-bundle the form's validator at startup. Found later, mid-session, Vite re-bundles
+    // it and the open page keeps requesting the stale copy (504), so the form script never runs.
+    optimizeDeps: { include: ['zod/mini'] },
   },
 });

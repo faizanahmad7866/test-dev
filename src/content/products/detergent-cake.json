@@ -1,5 +1,5 @@
 {
-  "order": 2,
+  "order": 3,
   "name": "Dinar Detergent Cake",
   "category": "Detergent cake",
   "categoryHi": "डिटर्जेंट केक",
@@ -18,6 +18,28 @@
       "mrp": 10,
       "image": "../../assets/products/detergent-cake/200g.png",
       "imageAlt": "Dinar Detergent Cake 200 g pack with lemon powder"
+    }
+  ],
+  "howToUse": [
+    {
+      "en": "Wet the clothes with water.",
+      "hi": "कपड़ों को पानी में भिगो लें।",
+      "image": "../../assets/products/detergent-cake/use-01.png"
+    },
+    {
+      "en": "Rub the cake on stains and dirty areas.",
+      "hi": "दाग़ वाली जगह पर केक रगड़ें।",
+      "image": "../../assets/products/detergent-cake/use-02.png"
+    },
+    {
+      "en": "Scrub well and rinse in clean water.",
+      "hi": "अच्छी तरह मलकर साफ़ पानी से धो लें।",
+      "image": "../../assets/products/detergent-cake/use-03.png"
+    },
+    {
+      "en": "Dry the clothes.",
+      "hi": "कपड़ों को सुखाएं।",
+      "image": "../../assets/products/detergent-cake/use-04.png"
     }
   ]
 }

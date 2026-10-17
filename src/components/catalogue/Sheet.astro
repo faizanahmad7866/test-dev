@@ -1,0 +1,46 @@
+---
+/**
+ * One A4 page of the catalogue. Inner pages carry a running head (logo, title, edition) and a
+ * running foot (website, page number) so any page printed or forwarded on its own still says
+ * whose it is and where to find more. Covers pass `bare` and lay out the whole page themselves.
+ */
+import { Image } from 'astro:assets';
+import logo from '@/assets/brand/dinar-logo.png';
+import { site } from '@/config/site';
+
+interface Props {
+  page?: number;
+  total?: number;
+  edition?: string;
+  bare?: boolean;
+  class?: string;
+}
+
+const { page, total, edition, bare = false, class: className } = Astro.props;
+const host = new URL(site.url).host;
+---
+
+<section class:list={['sheet', className]}>
+  {bare ? (
+    <slot />
+  ) : (
+    <div class="flex h-full flex-col px-12 pt-10 pb-8">
+      <header class="flex items-center justify-between">
+        <Image src={logo} alt={site.name} widths={[96, 192]} sizes="96px" class="h-12 w-auto" />
+        <p class="text-right text-xs leading-5 text-ink-500">
+          <span class="block font-bold text-navy-900">Product Catalogue</span>
+          {edition}
+        </p>
+      </header>
+      <div class="mt-8 flex-1">
+        <slot />
+      </div>
+      <footer class="mt-6 flex items-center justify-between text-xs text-ink-500">
+        <span class="font-bold text-navy-900">{host}</span>
+        <span>
+          Page {page} of {total}
+        </span>
+      </footer>
+    </div>
+  )}
+</section>

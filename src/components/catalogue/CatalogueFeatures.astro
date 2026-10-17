@@ -1,0 +1,59 @@
+---
+/** "What it does" for print: one soft card per feature group, the group's photo in a circle. */
+import { Image } from 'astro:assets';
+import type { ProductFeature } from '@/content.config';
+import { FEATURE_GROUP_VISUALS } from '@/data/feature-group-visuals';
+import { FEATURE_GROUP_IDS, FEATURE_GROUP_LABELS } from '@/data/feature-groups';
+
+interface Props {
+  features: ProductFeature[];
+}
+
+const { features } = Astro.props;
+const groups = FEATURE_GROUP_IDS.map((id) => ({
+  ...FEATURE_GROUP_LABELS[id],
+  image: FEATURE_GROUP_VISUALS[id],
+  items: features.filter(({ group }) => group === id),
+})).filter(({ items }) => items.length > 0);
+---
+
+<section>
+  <h3 class="text-lg font-bold text-navy-900">
+    What it does{' '}
+    <span lang="hi" class="ml-1 text-sm font-medium text-ink-500">
+      ख़ूबियाँ
+    </span>
+  </h3>
+  <div class="mt-4 grid grid-cols-3 gap-4">
+    {groups.map(({ label, labelHi, image, items }) => (
+      <div class="rounded-2xl bg-ink-50 p-5">
+        <div class="flex items-center gap-3">
+          <div class="size-12 shrink-0 overflow-hidden rounded-full bg-white ring-4 ring-white">
+            <Image
+              src={image}
+              alt=""
+              widths={[96]}
+              sizes="48px"
+              format="jpg"
+              class="size-full object-cover"
+            />
+          </div>
+          <h4 class="font-bold text-navy-900">
+            {label}{' '}
+            <span lang="hi" class="block text-xs font-medium text-brand-700">
+              {labelHi}
+            </span>
+          </h4>
+        </div>
+        <ul class="mt-4 space-y-3">
+          {items.map(({ title, description }) => (
+            <li>
+              <p class="text-sm font-bold text-navy-900">{title}</p>
+              <p class="mt-0.5 text-xs leading-5 text-ink-600">{description}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</section>

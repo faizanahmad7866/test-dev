@@ -1,0 +1,38 @@
+---
+/**
+ * A product's second catalogue page. With benefits already on the overview, it carries the
+ * feature groups and the usage steps; otherwise the features went on the overview, and this
+ * page gives the usage steps room to be large, then invites dealers to stock the product.
+ */
+import CatalogueFeatures from '@/components/catalogue/CatalogueFeatures.astro';
+import CatalogueOrderPanel from '@/components/catalogue/CatalogueOrderPanel.astro';
+import CatalogueUsage from '@/components/catalogue/CatalogueUsage.astro';
+import Sheet from '@/components/catalogue/Sheet.astro';
+import type { Product } from '@/content.config';
+
+interface Props {
+  product: Product;
+  content: 'features-and-usage' | 'usage-and-order';
+  page: number;
+  total: number;
+  edition: string;
+}
+
+const { product, content, page, total, edition } = Astro.props;
+const { data } = product;
+---
+
+<Sheet page={page} total={total} edition={edition}>
+  <p class="text-sm font-bold tracking-wide text-brand-700 uppercase">{data.name}</p>
+  {content === 'features-and-usage' ? (
+    <div class="mt-4 space-y-10">
+      <CatalogueFeatures features={data.features} />
+      {data.howToUse.length > 0 && <CatalogueUsage steps={data.howToUse} />}
+    </div>
+  ) : (
+    <div class="mt-4 space-y-8">
+      <CatalogueUsage steps={data.howToUse} layout="grid" />
+      <CatalogueOrderPanel productId={product.id} productName={data.name} />
+    </div>
+  )}
+</Sheet>

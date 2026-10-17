@@ -1,10 +1,20 @@
 ---
 import { getImage } from 'astro:assets';
-import logo from '@/assets/brand/dinar-logo.png';
+import { getCollection } from 'astro:content';
 import heroPoster from '@/assets/video/dinar-hero-poster.jpg';
+import heroPosterPortrait from '@/assets/video/dinar-hero-poster-portrait.jpg';
+import TradeEnquirySection from '@/components/products/TradeEnquirySection.astro';
 import { site } from '@/config/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { listSkus } from '@/lib/product-skus';
+import { buildOrganizationNode } from '@/lib/schema/organization-schema';
+import HomeBrandStripSection from '@/sections/home/HomeBrandStripSection.astro';
 import HomeHeroSection from '@/sections/home/HomeHeroSection.astro';
+import HomePromiseSection from '@/sections/home/HomePromiseSection.astro';
+import HomeRangeSection from '@/sections/home/HomeRangeSection.astro';
+import HomeSignOffSection from '@/sections/home/HomeSignOffSection.astro';
+import HomeSpotlightSection from '@/sections/home/HomeSpotlightSection.astro';
+import { PHONE_MEDIA } from '@/sections/home/hero-media';
 
 const POSTER_SIZES = '(min-width: 1920px) 1920px, 100vw';
 const poster = await getImage({
@@ -12,36 +22,52 @@ const poster = await getImage({
   widths: [640, 960, 1280, 1920],
   format: 'webp',
 });
-const schemaLogo = await getImage({ src: logo, width: 512, format: 'png' });
+const posterPortrait = await getImage({
+  src: heroPosterPortrait,
+  widths: [432, 648, 864],
+  format: 'webp',
+});
 
-const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: site.name,
-  url: site.url,
-  logo: new URL(schemaLogo.src, site.url).href,
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: site.supportPhone,
-    contactType: 'customer support',
-    areaServed: 'IN',
-  },
-};
+const skus = listSkus(await getCollection('products'));
+// The product with a formula sheet goes in focus, shown in its default pack.
+const spotlight = skus.find(
+  ({ product, variant }) =>
+    product.data.features.length > 0 && variant.id === product.data.defaultVariant,
+);
+
+const schema = { '@context': 'https://schema.org', ...(await buildOrganizationNode(site.url)) };
 ---
 
 <BaseLayout
   title={site.name}
-  description="Dinar Super Wash detergent powder and Dinar Detergent Cake. Freshness and brilliance after every wash, for hand and machine laundry."
+  description="Dinar Super Wash, Dinar Detergent Powder and Dinar Detergent Cake. Freshness and brilliance after every wash, for everyday family laundry."
   image={heroPoster}
   schema={schema}
 >
+  {/* One preload per poster, split by the same media query as the <picture>, so each device fetches only its own. */}
   <link
     slot="head"
     rel="preload"
     as="image"
+    media={PHONE_MEDIA}
+    imagesrcset={posterPortrait.srcSet.attribute}
+    imagesizes="100vw"
+    fetchpriority="high"
+  />
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    media="(min-width: 640px)"
     imagesrcset={poster.srcSet.attribute}
     imagesizes={POSTER_SIZES}
     fetchpriority="high"
   />
-  <HomeHeroSection poster={poster} sizes={POSTER_SIZES} />
+  <HomeHeroSection poster={poster} posterPortrait={posterPortrait} sizes={POSTER_SIZES} />
+  <HomeBrandStripSection />
+  <HomeRangeSection skus={skus} />
+  {spotlight && <HomeSpotlightSection sku={spotlight} />}
+  <HomePromiseSection />
+  <HomeSignOffSection />
+  <TradeEnquirySection />
 </BaseLayout>

@@ -29,15 +29,17 @@
   --color-ocean-600: #045dd1;
   --color-ocean-700: #034aa7;
 
-  /* Deep blue sampled from the range photography, so hero imagery melts into the page. */
+  /* Deep blue sampled from the range photography: the placeholder behind the hero film. */
   --color-abyss-950: #000d27;
-  --color-abyss-900: #03204c;
-  --color-abyss-800: #06265b;
 
   /* Pale blue backdrop of the pack shots — product stages use it so photos sit seamlessly. */
   --color-mist-50: #f3f8fd;
   --color-mist-100: #e4f0fb;
   --color-mist-200: #d3e4f4;
+
+  /* Backdrop of the range studio shot, sampled from the photo: sky above, floor below. */
+  --color-studio-sky: #d8ebf2;
+  --color-studio-floor: #f4f6f9;
 
   /* Rainbow arc accents — decorative only, never for text. */
   --color-sun-400: #f8e509;
@@ -66,11 +68,17 @@
   --text-nav: 0.9375rem;
   --text-nav--line-height: 1.25rem;
 
-  --shadow-cta: 0 1px 2px rgb(200 2 8 / 0.25), 0 8px 20px -6px rgb(200 2 8 / 0.5);
-  --shadow-card: 0 28px 56px -28px rgb(6 11 124 / 0.35);
   --shadow-header: 0 1px 0 rgb(6 11 124 / 0.04), 0 8px 24px -12px rgb(6 11 124 / 0.18);
 
   --animate-menu-item-in: menu-item-in 480ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  /* One copy of the brand strip slides past in this time: slow enough to read every line. */
+  --animate-marquee: marquee 45s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 
   @keyframes menu-item-in {
     from {
@@ -104,25 +112,120 @@
   );
 }
 
-/* The light burst behind the range photo, extended across the whole hero band. */
-@utility bg-hero {
-  background-image:
-    radial-gradient(
-      ellipse 55% 60% at 70% 40%,
-      color-mix(in oklab, var(--color-ocean-600) 45%, transparent),
-      transparent 70%
-    ),
-    linear-gradient(180deg, var(--color-abyss-950), var(--color-abyss-800));
+/*
+ * The products page opening band: the studio shot's own sky at the top, turning to its pale
+ * floor and then the page white towards the bottom, so the photo sits in the band rather
+ * than on it.
+ */
+@utility bg-studio {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-studio-sky) 0%,
+    var(--color-studio-sky) 55%,
+    var(--color-studio-floor) 82%,
+    var(--color-white) 100%
+  );
 }
 
-/* Studio-style backdrop for pack shots: a soft highlight over the pack-shot blue. */
+/* Backdrop for pack shots: the flat pale blue of the photography, so packs sit on it seamlessly. */
 @utility bg-stage {
-  background-image: radial-gradient(
-    ellipse 70% 60% at 50% 35%,
-    var(--color-white),
-    transparent 70%
-  );
   background-color: var(--color-mist-100);
+}
+
+/*
+ * `reveal`: content rises gently into place as it scrolls into view. Scroll-driven CSS, so no
+ * script runs; browsers without scroll timelines, and visitors who ask for reduced motion,
+ * simply see it in place. Longhands only: the `animation` shorthand would reset the timeline.
+ * Content already on screen at load is past its range, so it is never hidden.
+ */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .reveal {
+        animation-name: reveal-in;
+        animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range-start: entry 0%;
+        animation-range-end: entry 10rem;
+      }
+    }
+  }
+}
+
+/*
+ * The order dialog: a full-screen sheet on phones, a centred panel from sm up, laid out as a
+ * column (header, scrolling body, footer). It rises in briefly as it opens, and the page
+ * behind it stays still while it is open.
+ */
+.order-dialog {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background: var(--color-white);
+  color: inherit;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition:
+    opacity 200ms ease-out,
+    transform 200ms ease-out,
+    overlay 200ms allow-discrete,
+    display 200ms allow-discrete;
+}
+
+.order-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .order-dialog[open] {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+}
+
+.order-dialog::backdrop {
+  background: color-mix(in srgb, var(--color-navy-950) 60%, transparent);
+}
+
+@media (width >= 40rem) {
+  .order-dialog {
+    margin: auto;
+    width: min(64rem, 100% - 3rem);
+    height: auto;
+    max-height: calc(100dvh - 4rem);
+    border-radius: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-dialog {
+    transition: none;
+    transform: none;
+  }
+}
+
+html:has(.order-dialog[open]) {
+  overflow: hidden;
+}
+
+/* Moving content stops while the visitor points at it or tabs into it (WCAG 2.2.2). */
+.marquee:where(:hover, :focus-within) .marquee-track {
+  animation-play-state: paused;
 }
 
 @layer base {

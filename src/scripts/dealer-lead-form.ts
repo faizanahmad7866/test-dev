@@ -1,7 +1,9 @@
 /**
- * Dealer enquiry form: validates with the same Zod schema the server uses, shows errors
- * beside each field, submits as JSON with a Turnstile token and swaps in a success panel.
- * Entered values are never cleared on failure, so a network error costs the visitor nothing.
+ * Dealer application form: validates with the same Zod schema the server uses and shows
+ * errors beside each field. A valid application opens WhatsApp in a new tab, prefilled for
+ * the Dinar team, while this page stays put and shows what to do next. A copy is then saved
+ * on our server (JSON + Turnstile token) in the background, best effort: WhatsApp has
+ * already carried the application, so a failed save costs the visitor nothing.
  */
 import {
   DEALER_LEAD_ENDPOINT,
@@ -9,11 +11,14 @@ import {
   getFieldErrors,
   isDealerLeadField,
   MESSAGE_MAX_LENGTH,
+  type DealerLead,
   type DealerLeadField,
   type DealerLeadRequest,
   type DealerLeadResponse,
   type FieldErrors,
 } from '@/lib/schemas/dealer-lead';
+import { buildDealerWhatsAppMessage } from '@/lib/dealer-whatsapp';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { formatPhone } from '@/lib/format-phone';
 import { mountTurnstile, type TurnstileWidget } from '@/scripts/turnstile';
 
@@ -56,6 +61,20 @@ function readForm(form: HTMLFormElement): Record<DealerLeadField, unknown> {
   };
 }
 
+function readProductNames(json: string | undefined): Record<string, string> {
+  try {
+    const parsed: unknown = JSON.parse(json ?? '{}');
+    if (typeof parsed !== 'object' || parsed === null) return {};
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        (entry): entry is [string, string] => typeof entry[1] === 'string',
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
+
 function isDealerLeadResponse(value: unknown): value is DealerLeadResponse {
   return (
     typeof value === 'object' &&
@@ -75,17 +94,27 @@ export function initDealerLeadForm(): void {
   const alert = form.querySelector<HTMLElement>('[data-js="form-alert"]');
   const alertText = alert?.querySelector<HTMLElement>('[data-alert-text]');
   const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-  const submitLabel = submit?.querySelector<HTMLElement>('[data-submit-label]');
   const counter = form.querySelector<HTMLElement>('[data-js="message-counter"]');
   const turnstileSlot = form.querySelector<HTMLElement>('[data-js="turnstile"]');
-  const { turnstileSiteKey = '', supportPhone = '' } = form.dataset;
-  if (!success || !alert || !alertText || !submit || !submitLabel || !turnstileSlot) return;
+  const whatsappLink = success?.querySelector<HTMLAnchorElement>('[data-success-whatsapp]');
+  const referenceBlock = success?.querySelector<HTMLElement>('[data-success-reference-block]');
+  const referenceText = success?.querySelector<HTMLElement>('[data-success-reference]');
+  const phoneText = success?.querySelector<HTMLElement>('[data-success-phone]');
+  const { turnstileSiteKey = '', whatsappNumber = '' } = form.dataset;
+  const productNames = readProductNames(form.dataset['productNames']);
+  if (!success || !alert || !alertText || !submit || !turnstileSlot || !whatsappNumber) return;
+  if (!whatsappLink || !referenceBlock || !referenceText || !phoneText) return;
 
   // JS is running, so our inline errors replace the browser's own validation bubbles.
   form.noValidate = true;
+
+  // "Stock this product" on a product page arrives with ?product=<id>: tick it for the visitor.
+  const requestedProduct = new URLSearchParams(location.search).get('product');
+  for (const box of form.querySelectorAll<HTMLInputElement>('input[name="products"]')) {
+    if (box.value === requestedProduct) box.checked = true;
+  }
   const touched = new Set<DealerLeadField>();
   let turnstile: Promise<TurnstileWidget> | null = null;
-  let isSubmitting = false;
 
   const ensureTurnstile = () => {
     turnstile ??= mountTurnstile(turnstileSlot, turnstileSiteKey).catch((error: unknown) => {
@@ -126,25 +155,50 @@ export function initDealerLeadForm(): void {
     form.querySelector<FormControl>('[aria-invalid="true"]')?.focus();
   };
 
-  const setBusy = (isBusy: boolean) => {
-    isSubmitting = isBusy;
-    submit.disabled = isBusy;
-    submit.setAttribute('aria-busy', String(isBusy));
-    submitLabel.textContent = isBusy ? 'Sending…' : 'Submit enquiry';
-  };
-
-  const showSuccess = (referenceId: string, phone: string) => {
-    for (const slot of success.querySelectorAll<HTMLElement>('[data-success-reference]')) {
-      slot.textContent = referenceId;
-    }
-    for (const slot of success.querySelectorAll<HTMLElement>('[data-success-phone]')) {
-      slot.textContent = formatPhone(`+91${phone}`);
-    }
+  /** Opens WhatsApp in a new tab with the application, and swaps the form for the next-step panel. */
+  const handOffToWhatsApp = (lead: DealerLead) => {
+    const url = buildWhatsAppUrl(
+      whatsappNumber,
+      buildDealerWhatsAppMessage(lead, { productNames }),
+    );
+    // Called synchronously inside the submit's user activation: after an await, browsers
+    // block new tabs. noopener keeps the WhatsApp tab from reaching back into this page.
+    window.open(url, '_blank', 'noopener');
+    whatsappLink.href = url;
+    phoneText.textContent = formatPhone(`+91${lead.phone}`);
     form.hidden = true;
     success.hidden = false;
     // Move focus to the heading so screen readers announce the outcome, not silence.
     success.querySelector<HTMLElement>('[data-success-heading]')?.focus();
     card?.scrollIntoView({ block: 'start' });
+  };
+
+  /** Keeps a server copy of the application and shows its reference once saved. */
+  const saveLead = async (lead: DealerLead) => {
+    let widget: TurnstileWidget | null = null;
+    try {
+      widget = await ensureTurnstile();
+      const request: DealerLeadRequest = {
+        lead,
+        turnstileToken: await widget.getToken(TOKEN_TIMEOUT_MS),
+        website: new FormData(form).get('website')?.toString() ?? '',
+      };
+      const response = await fetch(DEALER_LEAD_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+        signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
+      });
+      const body: unknown = await response.json().catch(() => null);
+      if (isDealerLeadResponse(body) && body.ok) {
+        referenceText.textContent = body.referenceId;
+        referenceBlock.hidden = false;
+      }
+    } catch {
+      // Nothing to tell the visitor: their application already went out on WhatsApp.
+    } finally {
+      widget?.reset();
+    }
   };
 
   form.addEventListener('focusin', () => void ensureTurnstile().catch(() => undefined), {
@@ -174,9 +228,8 @@ export function initDealerLeadForm(): void {
   form.addEventListener('input', revalidateTouched);
   form.addEventListener('change', revalidateTouched);
 
-  form.addEventListener('submit', async (event) => {
+  form.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (isSubmitting) return;
     alert.hidden = true;
 
     const result = dealerLeadSchema.safeParse(readForm(form));
@@ -194,49 +247,10 @@ export function initDealerLeadForm(): void {
       return;
     }
 
-    setBusy(true);
-    let widget: TurnstileWidget | null = null;
-    try {
-      widget = await ensureTurnstile();
-      const request: DealerLeadRequest = {
-        lead: result.data,
-        turnstileToken: await widget.getToken(TOKEN_TIMEOUT_MS),
-        website: new FormData(form).get('website')?.toString() ?? '',
-      };
-      const response = await fetch(DEALER_LEAD_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(request),
-        signal: AbortSignal.timeout(SUBMIT_TIMEOUT_MS),
-      });
-      const body: unknown = await response.json().catch(() => null);
-
-      if (isDealerLeadResponse(body) && body.ok) {
-        showSuccess(body.referenceId, result.data.phone);
-        return;
-      }
-      if (
-        isDealerLeadResponse(body) &&
-        !body.ok &&
-        body.code === 'validation_failed' &&
-        body.fieldErrors
-      ) {
-        showErrors(body.fieldErrors, Object.keys(body.fieldErrors).filter(isDealerLeadField));
-        showAlert('Please check the highlighted fields below.');
-        focusFirstInvalid();
-        return;
-      }
-      const reference = isDealerLeadResponse(body) ? ` (reference ${body.referenceId})` : '';
-      showAlert(
-        `We couldn't send your enquiry${reference}. Your details are still here — please try again, or call us on ${supportPhone}.`,
-      );
-    } catch {
-      showAlert(
-        `We couldn't reach our server. Check your connection and try again, or call us on ${supportPhone}.`,
-      );
-    } finally {
-      widget?.reset();
-      setBusy(false);
-    }
+    handOffToWhatsApp(result.data);
+    void saveLead(result.data);
   });
+
+  // Every handler is wired: only now may the visitor submit (the markup ships it disabled).
+  submit.disabled = false;
 }

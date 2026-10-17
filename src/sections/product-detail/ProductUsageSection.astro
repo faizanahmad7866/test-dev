@@ -1,0 +1,23 @@
+---
+/**
+ * Using the product: the steps from the back of the pack (when the product has them), then
+ * the safety and storage precautions, which every product shows.
+ */
+import SafetyPrecautions from '@/components/products/SafetyPrecautions.astro';
+import UsageSteps from '@/components/products/UsageSteps.astro';
+import Container from '@/components/ui/Container.astro';
+import type { ProductUsageStep } from '@/content.config';
+
+interface Props {
+  steps: ProductUsageStep[];
+}
+
+const { steps } = Astro.props;
+---
+
+<div class="py-14 lg:py-20">
+  <Container class="space-y-14 lg:space-y-20">
+    {steps.length > 0 && <UsageSteps steps={steps} />}
+    <SafetyPrecautions />
+  </Container>
+</div>

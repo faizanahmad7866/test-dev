@@ -1,0 +1,67 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import TradeEnquirySection from '@/components/products/TradeEnquirySection.astro';
+import { site } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatMrp } from '@/lib/format-mrp';
+import { listSkus, skuName } from '@/lib/product-skus';
+import { buildProductPageSchema } from '@/lib/schema/product-schema';
+import ProductDetailHeroSection from '@/sections/product-detail/ProductDetailHeroSection.astro';
+import ProductStorySection from '@/sections/product-detail/ProductStorySection.astro';
+import ProductEnquirySection from '@/sections/product-detail/ProductEnquirySection.astro';
+import ProductUsageSection from '@/sections/product-detail/ProductUsageSection.astro';
+import RelatedProductsSection from '@/sections/product-detail/RelatedProductsSection.astro';
+
+export const getStaticPaths = (async () => {
+  const skus = listSkus(await getCollection('products'));
+  return skus.map((sku) => ({
+    params: { sku: sku.slug },
+    props: {
+      sku,
+      siblings: skus.filter(({ product }) => product.id === sku.product.id),
+      // Other packs of the same product first, then the rest of the range.
+      related: skus
+        .filter(({ slug }) => slug !== sku.slug)
+        .sort(
+          (a, b) =>
+            Number(b.product.id === sku.product.id) - Number(a.product.id === sku.product.id),
+        ),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { sku, siblings, related } = Astro.props;
+const { product, variant } = sku;
+
+const IMAGE_SIZES = '(min-width: 1280px) 690px, (min-width: 1024px) 56vw, 100vw';
+const image = await getImage({ src: variant.image, widths: [480, 720, 960, 1200], format: 'webp' });
+const schema = await buildProductPageSchema(sku, site.url);
+const description = [
+  `${skuName(sku)} (${variant.pack.toLowerCase()}).`,
+  product.data.tagline,
+  `MRP ${formatMrp(variant.mrp)}, inclusive of all taxes.`,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<BaseLayout title={skuName(sku)} description={description} image={variant.image} schema={schema}>
+  <link
+    slot="head"
+    rel="preload"
+    as="image"
+    imagesrcset={image.srcSet.attribute}
+    imagesizes={IMAGE_SIZES}
+    fetchpriority="high"
+  />
+  <ProductDetailHeroSection sku={sku} siblings={siblings} image={image} sizes={IMAGE_SIZES} />
+  <ProductStorySection product={product} />
+  <ProductUsageSection steps={product.data.howToUse} />
+  <ProductEnquirySection sku={sku} />
+  <RelatedProductsSection skus={related} />
+  <TradeEnquirySection />
+</BaseLayout>

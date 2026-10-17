@@ -1,0 +1,162 @@
+---
+/**
+ * Contact page body, laid out the way large consumer-goods companies do it: consumer care
+ * leads as the one prominent block (helpline first), the office address and business
+ * enquiries sit beside it as plain text, and the company's registered details close the page
+ * as a simple information table. Everything is read from site config.
+ */
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import CompanyLogo from '@/components/layout/CompanyLogo.astro';
+import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import { headerCta } from '@/config/navigation';
+import { site } from '@/config/site';
+import { formatAddress } from '@/lib/format-address';
+import { formatPhone } from '@/lib/format-phone';
+
+const { company } = site;
+const { office } = company;
+const officeLine = formatAddress(office);
+const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  `${company.legalName}, ${officeLine}`,
+)}`;
+
+const companyDetails = [
+  { label: 'Company', value: company.legalName },
+  { label: 'Brand', value: site.name },
+  { label: 'Proprietor', value: company.proprietor },
+  { label: 'Office', value: officeLine },
+];
+const blockTitleClass = 'text-sm font-bold tracking-wide uppercase';
+const textLinkClass =
+  'group mt-5 inline-flex min-h-11 items-center gap-2 font-bold text-navy-900 transition-colors hover:text-brand-700';
+---
+
+<section aria-labelledby="contact-title" class="pt-6 pb-14 lg:pt-10 lg:pb-20">
+  <Container>
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Contact', href: '/contact/' },
+      ]}
+    />
+
+    <div class="mt-8 max-w-3xl lg:mt-10">
+      <h1
+        id="contact-title"
+        class="text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl lg:text-6xl"
+      >
+        Contact us
+      </h1>
+      <p class="mt-4 text-lg text-pretty text-ink-600 sm:text-xl">
+        For questions about our products, feedback on a wash, or trade enquiries, reach the Dinar
+        team here.
+      </p>
+    </div>
+
+    <div class="mt-10 grid gap-6 lg:mt-14 lg:grid-cols-12 lg:gap-8">
+      <section
+        aria-labelledby="consumer-care-title"
+        class="reveal flex flex-col rounded-3xl bg-navy-900 p-7 text-white sm:p-10 lg:col-span-7 lg:p-12"
+      >
+        <h2 id="consumer-care-title" class:list={[blockTitleClass, 'text-sun-400']}>
+          Consumer care{' '}
+          <span lang="hi" class="ml-1 font-semibold tracking-normal text-white/70 normal-case">
+            उपभोक्ता सेवा
+          </span>
+        </h2>
+        <p class="mt-3 max-w-md text-lg text-white/80">Product questions, support and feedback.</p>
+
+        <dl class="mt-10 space-y-8">
+          <div>
+            <dt class="text-sm text-white/60">Helpline</dt>
+            <dd class="mt-1">
+              <a
+                href={`tel:${site.supportPhone}`}
+                class="text-3xl font-bold tracking-tight tabular-nums transition-colors hover:text-sun-400 sm:text-5xl"
+              >
+                {formatPhone(site.supportPhone)}
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-sm text-white/60">Email</dt>
+            <dd class="mt-1">
+              <a
+                href={`mailto:${site.email}`}
+                class="text-xl font-bold break-all transition-colors hover:text-sun-400 sm:text-2xl"
+              >
+                {site.email}
+              </a>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="mt-10 flex flex-wrap gap-3 lg:mt-auto lg:pt-10">
+          <Button href={`tel:${site.supportPhone}`} variant="light">
+            Call now
+          </Button>
+          <Button href={`mailto:${site.email}`} variant="outline">
+            Send an email
+          </Button>
+        </div>
+      </section>
+
+      <div class="grid gap-6 lg:col-span-5">
+        <section aria-labelledby="office-title" class="reveal rounded-3xl bg-ink-50 p-7 sm:p-8">
+          <h2 id="office-title" class:list={[blockTitleClass, 'text-brand-700']}>
+            Office
+          </h2>
+          <address class="mt-4 leading-relaxed text-ink-700 not-italic">
+            <strong class="text-xl font-bold text-navy-900">{company.legalName}</strong>
+            <br />
+            {`${office.streetAddress}, ${office.locality}`}
+            <br />
+            {`${office.region} ${office.postalCode}, India`}
+          </address>
+          <a href={mapsHref} target="_blank" rel="noopener" class={textLinkClass}>
+            Get directions
+            <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </a>
+        </section>
+
+        <section aria-labelledby="business-title" class="reveal rounded-3xl bg-ink-50 p-7 sm:p-8">
+          <h2 id="business-title" class:list={[blockTitleClass, 'text-brand-700']}>
+            Business enquiries
+          </h2>
+          <p class="mt-4 text-ink-700">
+            Retailers, wholesalers and distributors can apply to stock the Dinar range.
+          </p>
+          <a href={headerCta.href} class={textLinkClass}>
+            Apply for dealership
+            <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+          </a>
+        </section>
+      </div>
+    </div>
+
+    <section
+      aria-labelledby="company-info-title"
+      class="reveal mt-14 grid gap-8 rounded-3xl bg-ink-50 p-7 sm:p-10 lg:mt-20 lg:grid-cols-12 lg:gap-14"
+    >
+      <div class="lg:col-span-4">
+        <CompanyLogo size="md" />
+        <h2 id="company-info-title" class="mt-6 text-2xl font-bold tracking-tight text-navy-900">
+          Company information
+        </h2>
+        <p class="mt-2 text-ink-600">
+          {site.name} is made and marketed by {company.legalName}.
+        </p>
+      </div>
+      <dl class="grid content-center gap-x-8 gap-y-6 sm:grid-cols-2 lg:col-span-8">
+        {companyDetails.map(({ label, value }) => (
+          <div>
+            <dt class="text-sm text-ink-500">{label}</dt>
+            <dd class="mt-1 font-semibold text-navy-900">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  </Container>
+</section>

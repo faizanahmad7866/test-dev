@@ -1,26 +1,30 @@
 ---
 import { getImage } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import rangeLineup from '@/assets/brand/dinar-range-lineup.jpg';
+import rangeStudio from '@/assets/brand/dinar-range-studio.jpg';
+import TradeEnquirySection from '@/components/products/TradeEnquirySection.astro';
 import { site } from '@/config/site';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { buildProductsPageSchema } from '@/lib/schema/products-page-schema';
+import { listSkus } from '@/lib/product-skus';
+import { buildProductListSchema } from '@/lib/schema/product-schema';
 import ProductListSection from '@/sections/products/ProductListSection.astro';
-import ProductRangeSection from '@/sections/products/ProductRangeSection.astro';
 import ProductsHeadSection from '@/sections/products/ProductsHeadSection.astro';
-import TradeEnquirySection from '@/sections/products/TradeEnquirySection.astro';
 
-const BANNER_SIZES = '(min-width: 1920px) 1920px, 100vw';
+const BANNER_SIZES = '(min-width: 1152px) 1152px, 100vw';
 
-const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
-const banner = await getImage({ src: rangeLineup, widths: [640, 960, 1376], format: 'webp' });
-const schema = await buildProductsPageSchema(products, new URL(Astro.url.pathname, site.url));
+const skus = listSkus(await getCollection('products'));
+const banner = await getImage({
+  src: rangeStudio,
+  widths: [640, 960, 1376, 1920, 2400],
+  format: 'webp',
+});
+const schema = buildProductListSchema(skus, site.url);
 ---
 
 <BaseLayout
   title="Products"
-  description="Dinar Super Wash detergent powder in 500 g, 1 kg and 5 kg packs, and Dinar Detergent Cake. Pack sizes, MRPs and what each product does."
-  image={rangeLineup}
+  description="Dinar Super Wash, Dinar Detergent Powder and Dinar Detergent Cake. Every pack with its MRP, each with its own product page."
+  image={rangeStudio}
   schema={schema}
 >
   <link
@@ -32,7 +36,6 @@ const schema = await buildProductsPageSchema(products, new URL(Astro.url.pathnam
     fetchpriority="high"
   />
   <ProductsHeadSection banner={banner} sizes={BANNER_SIZES} />
-  <ProductListSection products={products} />
-  <ProductRangeSection products={products} />
+  <ProductListSection skus={skus} />
   <TradeEnquirySection />
 </BaseLayout>

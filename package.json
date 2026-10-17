@@ -14,6 +14,7 @@
     "check": "astro check",
     "test": "vitest run",
     "build": "astro build",
+    "catalogue": "astro build && node scripts/build-catalogue.mjs",
     "preview": "astro preview",
     "dev:functions": "astro build && wrangler pages dev",
     "db:migrate:local": "wrangler d1 migrations apply dinar-leads --local"
@@ -22,6 +23,7 @@
     "@lucide/astro": "^1.57.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.0",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4.3.3",
     "zod": "^4.6.7"
   },
@@ -29,6 +31,7 @@
     "@astrojs/check": "^0.9.10",
     "@cloudflare/workers-types": "^5.20261015.1",
     "@eslint/js": "^10.0.1",
+    "@types/qrcode": "^1.5.6",
     "eslint": "^10.13.0",
     "eslint-plugin-astro": "^3.2.1",
     "eslint-plugin-jsx-a11y-x": "^0.2.0",

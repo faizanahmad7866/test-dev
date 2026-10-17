@@ -1,0 +1,118 @@
+---
+/**
+ * Site footer: brand and its parent company, every product page, the company pages, the support line and social
+ * handles, then the legal line. Product links are built from the catalogue, so a new pack
+ * appears here on the next build without touching this file.
+ */
+import { getCollection } from 'astro:content';
+import CompanyLogo from '@/components/layout/CompanyLogo.astro';
+import SiteLogo from '@/components/layout/SiteLogo.astro';
+import Container from '@/components/ui/Container.astro';
+import { headerCta } from '@/config/navigation';
+import { site } from '@/config/site';
+import { getCatalogueDownload } from '@/lib/catalogue';
+import { formatAddress } from '@/lib/format-address';
+import { formatPhone } from '@/lib/format-phone';
+import { listSkus, skuName, skuPath } from '@/lib/product-skus';
+
+const skus = listSkus(await getCollection('products'));
+const catalogue = getCatalogueDownload();
+const year = new Date().getFullYear();
+const companyLine = `Manufactured and marketed by ${site.company.legalName}, ${formatAddress(site.company.office)}.`;
+const linkClass =
+  'inline-flex min-h-11 items-center font-medium text-ink-700 transition-colors hover:text-brand-700 sm:min-h-0';
+---
+
+<footer class="bg-ink-50 text-sm">
+  <Container class="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-12 lg:py-16">
+    <div class="sm:col-span-2 lg:col-span-4">
+      <SiteLogo />
+      <p class="mt-6 max-w-xs leading-6 text-ink-600">
+        Detergent powder and detergent cake for everyday laundry.
+      </p>
+      <p lang="hi" class="mt-2 text-ink-500">
+        सफ़ाई जो दिखे, ख़ुशबू जो महके।
+      </p>
+      <div class="mt-8">
+        <p class="text-xs font-semibold tracking-wide text-ink-500 uppercase">A brand of</p>
+        <CompanyLogo size="sm" class="mt-2" />
+      </div>
+    </div>
+
+    <nav aria-labelledby="footer-products" class="lg:col-span-3">
+      <h2 id="footer-products" class="font-bold text-navy-900">
+        Products
+      </h2>
+      <ul class="mt-4 space-y-1 sm:space-y-3">
+        {skus.map((sku) => (
+          <li>
+            <a href={skuPath(sku)} class={linkClass}>
+              {skuName(sku)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav aria-labelledby="footer-company" class="lg:col-span-2">
+      <h2 id="footer-company" class="font-bold text-navy-900">
+        Company
+      </h2>
+      <ul class="mt-4 space-y-1 sm:space-y-3">
+        <li>
+          <a href="/products/" class={linkClass}>
+            All products
+          </a>
+        </li>
+        <li>
+          <a href={headerCta.href} class={linkClass}>
+            {headerCta.label}
+          </a>
+        </li>
+        <li>
+          <a href="/contact/" class={linkClass}>
+            Contact us
+          </a>
+        </li>
+        <li>
+          <a href={catalogue.href} download type="application/pdf" class={linkClass}>
+            Product catalogue ({catalogue.label})
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="lg:col-span-3">
+      <h2 class="font-bold text-navy-900">Customer support</h2>
+      <p class="mt-4 text-ink-500">Support and feedback</p>
+      <a
+        href={`tel:${site.supportPhone}`}
+        class="mt-1 block w-fit text-lg font-bold text-navy-900 tabular-nums transition-colors hover:text-brand-700"
+      >
+        {formatPhone(site.supportPhone)}
+      </a>
+      <a href={`mailto:${site.email}`} class={linkClass}>
+        {site.email}
+      </a>
+      <p class="mt-6 text-ink-500">Follow {site.socialHandle}</p>
+      <ul class="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+        {site.social.map(({ label, href }) => (
+          <li>
+            <a href={href} rel="noopener noreferrer" class={linkClass}>
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Container>
+
+  <div class="border-t border-ink-200">
+    <Container class="flex flex-col gap-2 py-6 text-xs leading-5 text-ink-500 lg:flex-row lg:justify-between lg:gap-8">
+      <p>
+        © {year} {site.name}. {companyLine}
+      </p>
+      <p class="shrink-0">All prices shown are MRP, inclusive of all taxes.</p>
+    </Container>
+  </div>
+</footer>

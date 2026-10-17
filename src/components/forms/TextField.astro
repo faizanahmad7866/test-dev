@@ -1,7 +1,8 @@
 ---
 /**
  * Labelled text input with optional prefix, hint and an error slot that form scripts fill.
- * The input is described by both hint and error, so screen readers hear the fix with the field.
+ * Rounded, with a navy ring on focus and red when invalid; the input is described by both
+ * hint and error, so screen readers hear the fix with the field.
  */
 import type { HTMLAttributes } from 'astro/types';
 import FieldError from '@/components/forms/FieldError.astro';
@@ -44,10 +45,10 @@ const errorId = `${id}-error`;
 
 <div class:list={[isWide && 'sm:col-span-2']}>
   <FieldLabel for={id} label={label} isRequired={isRequired} />
-  <div class="mt-2 flex overflow-hidden rounded-xl bg-white ring-1 ring-ink-300 transition-shadow focus-within:ring-2 focus-within:ring-ocean-600 hover:ring-ink-500 has-aria-invalid:ring-2 has-aria-invalid:ring-brand-700 motion-reduce:transition-none">
+  <div class="mt-2 flex overflow-hidden rounded-xl border border-ink-300 bg-white transition-colors hover:border-ink-500 focus-within:border-navy-900 focus-within:ring-1 focus-within:ring-navy-900 has-aria-invalid:border-brand-700 has-aria-invalid:ring-1 has-aria-invalid:ring-brand-700 motion-reduce:transition-none">
     {prefix && (
       <span
-        class="flex items-center border-r border-ink-200 bg-ink-50 px-3.5 text-sm font-semibold text-ink-600"
+        class="flex items-center bg-ink-50 px-3.5 text-sm font-semibold text-ink-600 tabular-nums"
         aria-hidden="true"
       >
         {prefix}
@@ -64,13 +65,13 @@ const errorId = `${id}-error`;
       placeholder={placeholder}
       aria-describedby={hint ? `${hintId} ${errorId}` : errorId}
       class:list={[
-        'h-12 w-full min-w-0 bg-transparent px-4 text-base text-navy-900 placeholder:text-ink-500 focus:outline-none',
+        'h-12 w-full min-w-0 bg-transparent px-3.5 text-base text-navy-900 placeholder:text-ink-400 focus:outline-none',
         isUppercase && 'uppercase placeholder:normal-case',
       ]}
     />
   </div>
   {hint && (
-    <p id={hintId} class="mt-1.5 text-sm text-ink-500">
+    <p id={hintId} class="mt-2 text-xs text-ink-600">
       {hint}
     </p>
   )}

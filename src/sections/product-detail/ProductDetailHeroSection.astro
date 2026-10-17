@@ -1,0 +1,158 @@
+---
+/**
+ * Top of a pack's detail page: the pack photos large on the studio backdrop (held in view
+ * while the facts scroll on desktop), then name, promise, the pack's claims as a checklist,
+ * links to the product's other pack sizes, the facts with MRP, "Shop now" (the WhatsApp
+ * order panel) and the trade call to action.
+ * The front photo is the LCP element, so the page hands in a pre-built image it also preloads.
+ */
+import type { GetImageResult } from 'astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
+import CheckList from '@/components/products/CheckList.astro';
+import ProductGallery from '@/components/products/ProductGallery.astro';
+import SpecList from '@/components/products/SpecList.astro';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import OrderDialog from '@/components/order/OrderDialog.astro';
+import { site } from '@/config/site';
+import { buttonClasses } from '@/lib/button-classes';
+import { formatPhone } from '@/lib/format-phone';
+import { packPhotoFit } from '@/lib/pack-photo';
+import { skuName, skuPath, type ProductSku } from '@/lib/product-skus';
+
+interface Props {
+  sku: ProductSku;
+  /** Every pack of this product, including the current one, for the pack-size links. */
+  siblings: ProductSku[];
+  image: GetImageResult;
+  sizes: string;
+}
+
+const { sku, siblings, image, sizes } = Astro.props;
+const { product, variant } = sku;
+const { data } = product;
+
+const specs = [
+  { label: 'Net quantity', value: variant.label },
+  { label: 'Pack', value: variant.pack },
+  { label: 'Format', value: data.format },
+  ...(data.suitableFor ? [{ label: 'Suitable for', value: data.suitableFor }] : []),
+  ...(data.shelfLife ? [{ label: 'Shelf life', value: data.shelfLife }] : []),
+  ...(data.alsoPackedIn.length > 0
+    ? [{ label: 'Also packed in', value: data.alsoPackedIn.join(', ') }]
+    : []),
+];
+---
+
+<section aria-labelledby="product-title" class="pt-6 pb-14 lg:pt-10 lg:pb-20">
+  <Container>
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Products', href: '/products/' },
+        { label: skuName(sku), href: skuPath(sku) },
+      ]}
+    />
+
+    <div class="mt-6 grid gap-10 lg:mt-8 lg:grid-cols-12 lg:gap-14">
+      <div class="lg:col-span-7">
+        <ProductGallery
+          front={{
+            image,
+            source: variant.image,
+            alt: variant.imageAlt,
+            fit: packPhotoFit(variant),
+          }}
+          back={data.packBack}
+          sizes={sizes}
+        />
+      </div>
+
+      <div class="lg:col-span-5">
+        <p class="font-semibold text-brand-700">
+          {data.category}{' '}
+          <span lang="hi" class="ml-1 font-medium text-ink-500">
+            {data.categoryHi}
+          </span>
+        </p>
+        <h1
+          id="product-title"
+          class="mt-2 text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl"
+        >
+          {data.name} <span class="whitespace-nowrap text-ink-500">{variant.label}</span>
+        </h1>
+        {data.tagline && (
+          <p class="mt-4 text-xl font-semibold text-pretty text-brand-700">{data.tagline}</p>
+        )}
+        {data.taglineHi && (
+          <p lang="hi" class="mt-1 text-lg text-ink-600">
+            {data.taglineHi}
+          </p>
+        )}
+
+        <div class="mt-6">
+          <CheckList items={data.highlights} />
+        </div>
+
+        {siblings.length > 1 && (
+          <div class="mt-8">
+            <p id="pack-sizes-label" class="text-sm font-semibold text-navy-900">
+              Pack size
+            </p>
+            <ul aria-labelledby="pack-sizes-label" class="mt-3 flex flex-wrap gap-2">
+              {siblings.map((sibling) => (
+                <li>
+                  <a
+                    href={skuPath(sibling)}
+                    aria-current={sibling.slug === sku.slug ? 'page' : undefined}
+                    class="inline-flex h-11 min-w-20 items-center justify-center rounded-full border-2 border-ink-200 px-5 text-sm font-bold text-navy-900 transition-colors hover:border-navy-900 current:border-navy-900 current:bg-navy-900 current:text-white motion-reduce:transition-none"
+                  >
+                    {sibling.variant.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="mt-8">
+          <SpecList rows={specs} mrp={variant.mrp} />
+        </div>
+
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {variant.onlineOrder && (
+            <button
+              type="button"
+              data-js="order-open"
+              class:list={[buttonClasses('primary', 'lg'), 'w-full sm:w-auto']}
+            >
+              Shop now
+            </button>
+          )}
+          <Button
+            href={`/dealership/?product=${product.id}#application`}
+            variant={variant.onlineOrder ? 'outline' : 'primary'}
+            size="lg"
+            class:list={['w-full sm:w-auto', variant.onlineOrder && 'text-navy-900']}
+          >
+            Stock this product
+          </Button>
+        </div>
+        <div class="mt-4">
+          <p class="text-sm text-ink-600">
+            Questions? Call{' '}
+            <a
+              href={`tel:${site.supportPhone}`}
+              class="font-bold text-navy-900 tabular-nums transition-colors hover:text-brand-700"
+            >
+              {formatPhone(site.supportPhone)}
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </Container>
+  {variant.onlineOrder && (
+    <OrderDialog sku={sku} siblings={siblings.filter((sibling) => sibling.variant.onlineOrder)} />
+  )}
+</section>

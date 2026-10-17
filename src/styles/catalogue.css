@@ -1,0 +1,40 @@
+/*
+ * A4 sheets for the product catalogue. In print each sheet is exactly one page; on screen the
+ * sheets stack on a grey desk so the layout can be checked before printing.
+ */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sheet {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  break-after: page;
+  background: var(--color-white);
+}
+
+@media screen {
+  body {
+    background: var(--color-ink-200);
+    padding-block: 2rem;
+  }
+
+  .sheet {
+    margin-inline: auto;
+    margin-block-end: 2rem;
+  }
+}
+
+/* QR codes arrive as inline SVG without size: fill their box. */
+.qr svg {
+  width: 100%;
+  height: 100%;
+}

@@ -20,14 +20,14 @@ const errorId = `${id}-error`;
 
 <div>
   <FieldLabel for={id} label={label} isRequired={isRequired} />
-  <div class="relative mt-2 rounded-xl bg-white ring-1 ring-ink-300 transition-shadow focus-within:ring-2 focus-within:ring-ocean-600 hover:ring-ink-500 has-aria-invalid:ring-2 has-aria-invalid:ring-brand-700 motion-reduce:transition-none">
+  <div class="relative mt-2 rounded-xl border border-ink-300 bg-white transition-colors hover:border-ink-500 focus-within:border-navy-900 focus-within:ring-1 focus-within:ring-navy-900 has-aria-invalid:border-brand-700 has-aria-invalid:ring-1 has-aria-invalid:ring-brand-700 motion-reduce:transition-none">
     <select
       id={id}
       name={name}
       required={isRequired}
       autocomplete={autocomplete}
       aria-describedby={errorId}
-      class="h-12 w-full cursor-pointer appearance-none rounded-xl bg-transparent pr-11 pl-4 text-base text-navy-900 focus:outline-none"
+      class="h-12 w-full cursor-pointer appearance-none bg-transparent pr-10 pl-3.5 text-base text-navy-900 focus:outline-none"
     >
       <option value="">{placeholder}</option>
       {options.map(({ value, label: optionLabel }) => (
@@ -36,7 +36,7 @@ const errorId = `${id}-error`;
     </select>
     <Icon
       name="chevron-down"
-      class="pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2 text-ink-500"
+      class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-ink-500"
     />
   </div>
   <FieldError id={errorId} name={name} />

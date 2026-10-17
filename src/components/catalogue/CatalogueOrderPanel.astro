@@ -1,0 +1,33 @@
+---
+/**
+ * "Stock this product" for print: a QR code to the dealer application with this product
+ * already ticked, and the number to call or WhatsApp instead.
+ */
+import { site } from '@/config/site';
+import { formatPhone } from '@/lib/format-phone';
+import { qrCodeSvg } from '@/lib/qr-code';
+
+interface Props {
+  productId: string;
+  productName: string;
+}
+
+const { productId, productName } = Astro.props;
+const applyUrl = new URL(`/dealership/?product=${productId}`, site.url);
+const qr = await qrCodeSvg(applyUrl.href);
+---
+
+<div class="flex items-center gap-6 rounded-2xl bg-navy-900 p-5 text-white">
+  <div class="qr size-28 shrink-0 rounded-xl bg-white p-2.5 text-navy-900" set:html={qr} />
+  <div>
+    <p class="text-sm font-bold tracking-wide text-sun-400 uppercase">
+      For retailers and distributors
+    </p>
+    <p class="mt-1 text-xl font-bold">Stock {productName}</p>
+    <p class="mt-2 text-sm leading-6 text-white/80">
+      Scan to apply online with this product selected, or call or WhatsApp the Dinar team on{' '}
+      <span class="font-bold whitespace-nowrap text-white">{formatPhone(site.whatsappNumber)}</span>
+      .
+    </p>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+---
+/**
+ * Document shell for the printable product catalogue: fonts and styles only, no site header
+ * or footer. Kept out of search: the PDF printed from it is what visitors download.
+ */
+import { Font } from 'astro:assets';
+import '@/styles/global.css';
+import '@/styles/catalogue.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <Font cssVariable="--font-plex-sans" preload />
+    <Font cssVariable="--font-plex-devanagari" preload />
+    <Font cssVariable="--font-plex-mono" />
+  </head>
+  <body class="font-sans text-ink-900 antialiased">
+    <slot />
+  </body>
+</html>

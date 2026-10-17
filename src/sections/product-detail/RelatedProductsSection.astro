@@ -1,0 +1,39 @@
+---
+/** The other packs, as product cards. Packs of the same product are listed first. */
+import ProductTile from '@/components/products/ProductTile.astro';
+import Container from '@/components/ui/Container.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { productGridColumns } from '@/lib/product-grid';
+import type { ProductSku } from '@/lib/product-skus';
+
+interface Props {
+  skus: ProductSku[];
+}
+
+const { skus } = Astro.props;
+---
+
+<section aria-labelledby="related-title" class="py-14 lg:py-20">
+  <Container>
+    <SectionHeader
+      id="related-title"
+      title="More from Dinar"
+      link={{ href: '/products/', label: 'View all products' }}
+    />
+    <ul
+      class:list={[
+        'mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 lg:mt-10',
+        productGridColumns(skus.length),
+      ]}
+    >
+      {skus.map((sku) => (
+        <li>
+          <ProductTile
+            sku={sku}
+            sizes="(min-width: 1280px) 405px, (min-width: 1024px) 31vw, 50vw"
+          />
+        </li>
+      ))}
+    </ul>
+  </Container>
+</section>

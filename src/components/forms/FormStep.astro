@@ -1,33 +1,35 @@
 ---
-/** One numbered part of a long form ("Step 01 · Your details") with a two-column field grid. */
-import Icon from '@/components/ui/Icon.astro';
-import type { IconName } from '@/lib/icon-names';
-
+/**
+ * One numbered part of a long form: a step badge, the title and its Hindi label, then a
+ * two-column field grid. Steps are separated by space, not rules.
+ */
 interface Props {
   step: number;
   title: string;
-  icon: IconName;
+  titleHi: string;
 }
 
-const { step, title, icon } = Astro.props;
+const { step, title, titleHi } = Astro.props;
 const headingId = `form-step-${step}`;
 ---
 
-<section aria-labelledby={headingId} class="border-t border-ink-200 pt-8">
-  <div class="flex items-center gap-4">
-    <span class="grid size-11 place-items-center rounded-xl bg-navy-50 text-navy-700">
-      <Icon name={icon} />
+<section aria-labelledby={headingId}>
+  <div class="flex items-center gap-3">
+    <span
+      class="grid size-8 shrink-0 place-items-center rounded-full bg-navy-900 text-sm font-bold text-white tabular-nums"
+      aria-hidden="true"
+    >
+      {step}
     </span>
-    <div>
-      <p class="text-xs font-bold tracking-widest text-brand-700 uppercase tabular-nums">
-        Step {String(step).padStart(2, '0')}
-      </p>
-      <h3 id={headingId} class="text-lg font-extrabold tracking-tight text-navy-900">
-        {title}
-      </h3>
-    </div>
+    <h3 id={headingId} class="text-xl font-bold text-navy-900">
+      <span class="sr-only">{`Step ${step}: `}</span>
+      {title}{' '}
+      <span lang="hi" class="ml-1 text-base font-medium text-ink-500">
+        {titleHi}
+      </span>
+    </h3>
   </div>
-  <div class="mt-6 grid gap-x-5 gap-y-6 sm:grid-cols-2">
+  <div class="mt-6 grid gap-x-6 gap-y-6 sm:grid-cols-2">
     <slot />
   </div>
 </section>

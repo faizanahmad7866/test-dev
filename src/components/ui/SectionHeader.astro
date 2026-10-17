@@ -1,0 +1,56 @@
+---
+/**
+ * The opening of a content section: a bold navy heading, an optional one-line subtitle, and
+ * an optional link to go further. Hierarchy comes from size, weight and colour, not rules.
+ */
+import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  subtitle?: string;
+  link?: { href: string; label: string };
+  tone?: 'light' | 'dark';
+  /** `center` for sections whose content is itself centred, such as a row of badges. */
+  align?: 'start' | 'center';
+}
+
+const { id, title, subtitle, link, tone = 'light', align = 'start' } = Astro.props;
+const isDark = tone === 'dark';
+---
+
+<div
+  class:list={[
+    'reveal flex flex-wrap items-end gap-x-10 gap-y-4',
+    align === 'center' ? 'justify-center text-center' : 'justify-between',
+  ]}
+>
+  <div class="max-w-2xl">
+    <h2
+      id={id}
+      class:list={[
+        'text-3xl font-bold tracking-tight text-balance sm:text-4xl',
+        isDark ? 'text-white' : 'text-navy-900',
+      ]}
+    >
+      {title}
+    </h2>
+    {subtitle && (
+      <p class:list={['mt-3 text-lg text-pretty', isDark ? 'text-white/80' : 'text-ink-600']}>
+        {subtitle}
+      </p>
+    )}
+  </div>
+  {link && (
+    <a
+      href={link.href}
+      class:list={[
+        'group inline-flex min-h-11 items-center gap-2 font-bold transition-colors',
+        isDark ? 'text-white hover:text-white/80' : 'text-navy-900 hover:text-brand-700',
+      ]}
+    >
+      {link.label}
+      <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+    </a>
+  )}
+</div>

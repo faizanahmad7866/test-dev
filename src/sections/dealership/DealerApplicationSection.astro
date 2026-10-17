@@ -1,0 +1,78 @@
+---
+/**
+ * The application form on a white card, beside a sticky column with the range a dealer
+ * would stock and the phone line. The form comes first in the DOM, so phones and screen
+ * readers reach it first.
+ */
+import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+import Container from '@/components/ui/Container.astro';
+import { site } from '@/config/site';
+import type { Product } from '@/content.config';
+import { formatMrp } from '@/lib/format-mrp';
+import { formatPhone } from '@/lib/format-phone';
+import DealerLeadForm from '@/sections/dealership/DealerLeadForm.astro';
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+const range = products.map(({ data }) => ({
+  name: data.name,
+  packs: data.variants.map(({ label }) => label).join(', '),
+  lowestMrp: formatMrp(Math.min(...data.variants.map(({ mrp }) => mrp))),
+}));
+---
+
+<section id="application" class="scroll-mt-20 bg-ink-50 py-14 lg:py-20">
+  <Container class="grid gap-6 lg:grid-cols-12 lg:gap-8">
+    <div class="rounded-3xl bg-white p-6 sm:p-10 lg:col-span-8 lg:col-start-5">
+      <DealerLeadForm products={products} />
+    </div>
+
+    <aside
+      aria-label="The Dinar range and contact"
+      class="space-y-6 lg:sticky lg:top-28 lg:col-span-4 lg:row-start-1 lg:self-start"
+    >
+      <div class="rounded-3xl bg-white p-6 sm:p-8">
+        <p class="text-lg font-bold text-navy-900">
+          The Dinar range{' '}
+          <span lang="hi" class="ml-1 text-sm font-medium text-ink-500">
+            उत्पाद
+          </span>
+        </p>
+        <ul class="mt-5 space-y-4">
+          {range.map(({ name, packs, lowestMrp }) => (
+            <li>
+              <p class="font-bold text-navy-900">{name}</p>
+              <p class="mt-0.5 flex items-baseline justify-between gap-4 text-sm text-ink-600">
+                <span>{packs}</span>
+                <span class="shrink-0 font-semibold text-navy-900 tabular-nums">
+                  from {lowestMrp}
+                </span>
+              </p>
+            </li>
+          ))}
+        </ul>
+        <a
+          href="/products/"
+          class="group mt-5 inline-flex min-h-11 items-center gap-2 font-bold text-navy-900 transition-colors hover:text-brand-700"
+        >
+          View products
+          <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
+        </a>
+      </div>
+
+      <div class="rounded-3xl bg-navy-900 p-6 text-white sm:p-8">
+        <p class="text-lg font-bold">Prefer to call?</p>
+        <p class="mt-1 text-sm text-white/70">Customer support and feedback</p>
+        <a
+          href={`tel:${site.supportPhone}`}
+          class="mt-4 inline-block text-2xl font-bold tabular-nums transition-colors hover:text-sun-400"
+        >
+          {formatPhone(site.supportPhone)}
+        </a>
+      </div>
+    </aside>
+  </Container>
+</section>

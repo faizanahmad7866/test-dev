@@ -1,0 +1,68 @@
+---
+/**
+ * "How to use" from the back of the pack. From sm the steps sit side by side, four across on
+ * desktop: photo on top, then a numbered badge and the instruction. Phones stack the steps as
+ * rows, a small photo beside its text, alternating sides in a zig-zag. Steps without photos
+ * use the same captions on soft cards. Photos are visual only (empty alt): the text carries
+ * the instruction.
+ */
+import { Image } from 'astro:assets';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import type { ProductUsageStep } from '@/content.config';
+
+interface Props {
+  steps: ProductUsageStep[];
+}
+
+const { steps } = Astro.props;
+const hasPhotos = steps.every(({ image }) => image !== undefined);
+const badgeClass =
+  'grid size-8 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white tabular-nums';
+---
+
+<section aria-labelledby="usage-title">
+  <SectionHeader id="usage-title" title="How to use" />
+
+  {hasPhotos ? (
+    <ol class="mt-8 flex flex-col gap-6 sm:grid sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:mt-10 lg:grid-cols-4">
+      {steps.map(({ en, hi, image }, index) => (
+        <li class="reveal flex items-center gap-5 even:flex-row-reverse sm:block">
+          {image && (
+            <div class="aspect-3/4 w-2/5 shrink-0 overflow-hidden rounded-2xl bg-ink-100 sm:w-auto">
+              <Image
+                src={image}
+                alt=""
+                widths={[240, 360, 480, 720]}
+                sizes="(min-width: 1280px) 280px, (min-width: 1024px) 23vw, (min-width: 640px) 45vw, 40vw"
+                class="size-full object-cover"
+              />
+            </div>
+          )}
+          <div class="min-w-0 flex-1 sm:mt-5">
+            <span class={badgeClass}>{index + 1}</span>
+            <p class="mt-3 font-bold text-pretty text-navy-900 sm:text-lg">{en}</p>
+            {hi && (
+              <p lang="hi" class="mt-1 text-sm leading-6 text-ink-600 sm:text-base">
+                {hi}
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <ol class="mt-8 grid gap-4 sm:grid-cols-2 lg:mt-10 lg:grid-cols-4">
+      {steps.map(({ en, hi }, index) => (
+        <li class="reveal rounded-2xl bg-ink-50 p-6">
+          <span class={badgeClass}>{index + 1}</span>
+          <p class="mt-3 font-bold text-navy-900">{en}</p>
+          {hi && (
+            <p lang="hi" class="mt-1 text-sm text-ink-600">
+              {hi}
+            </p>
+          )}
+        </li>
+      ))}
+    </ol>
+  )}
+</section>

@@ -1,0 +1,156 @@
+---
+/**
+ * A product's main catalogue page: name and promise, every pack as a photo tile, what
+ * the pack claims, pack sizes with MRP, the specifications and the description, closed by the
+ * one further part that fits: key benefits, the feature groups, or (for a single-page product)
+ * the usage steps.
+ */
+import { Image } from 'astro:assets';
+import CatalogueFeatures from '@/components/catalogue/CatalogueFeatures.astro';
+import CatalogueUsage from '@/components/catalogue/CatalogueUsage.astro';
+import Sheet from '@/components/catalogue/Sheet.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Product } from '@/content.config';
+import { formatMrp } from '@/lib/format-mrp';
+
+interface Props {
+  product: Product;
+  closing: 'benefits' | 'features' | 'usage';
+  page: number;
+  total: number;
+  edition: string;
+}
+
+const { product, closing, page, total, edition } = Astro.props;
+const { data } = product;
+// One tile per distinct photo: packs that share a photo (a new size shot later) show it once.
+const photos = data.variants.filter(
+  (variant, index, all) => all.findIndex(({ image }) => image.src === variant.image.src) === index,
+);
+const specs = [
+  { label: 'Format', value: data.format },
+  ...(data.suitableFor ? [{ label: 'Suitable for', value: data.suitableFor }] : []),
+  ...(data.shelfLife ? [{ label: 'Shelf life', value: data.shelfLife }] : []),
+];
+const labelClass = 'text-xs font-bold tracking-wide text-ink-500 uppercase';
+const checkClass =
+  'grid size-5 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700';
+---
+
+<Sheet page={page} total={total} edition={edition}>
+  <p class="text-sm font-bold tracking-wide text-brand-700 uppercase">
+    {data.category}{' '}
+    <span lang="hi" class="ml-1 font-semibold tracking-normal normal-case">
+      {data.categoryHi}
+    </span>
+  </p>
+  <h2 class="mt-2 text-4xl font-bold tracking-tight text-navy-900">{data.name}</h2>
+  {data.tagline && (
+    <p class="mt-2 text-lg font-semibold text-brand-700">
+      {data.tagline}
+      {data.taglineHi && (
+        <span lang="hi" class="ml-2 text-base font-medium text-ink-600">
+          {data.taglineHi}
+        </span>
+      )}
+    </p>
+  )}
+
+  <div class="mt-6 grid grid-cols-12 gap-6">
+    {/* Each pack is its own rounded tile on the photo's own backdrop: no CSS masks, which
+        PDF viewers render as slow transparency groups. Packs share a baseline, so sizes read
+        true to scale. */}
+    <div class="col-span-5 flex items-end justify-center gap-3">
+      {photos.map(({ image, imageAlt }) => (
+        <div class="min-w-0 flex-1">
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[640]}
+            sizes="290px"
+            format="jpg"
+            quality={82}
+            class="mx-auto h-auto max-h-80 w-auto max-w-full rounded-2xl"
+          />
+        </div>
+      ))}
+    </div>
+
+    <div class="col-span-7 space-y-5">
+      <div>
+        <h3 class={labelClass}>On the pack</h3>
+        <ul class="mt-2 flex flex-wrap gap-x-5 gap-y-2">
+          {data.highlights.map((highlight) => (
+            <li class="flex items-center gap-2 text-sm font-semibold text-navy-900">
+              <span class={checkClass}>
+                <Icon name="check" class="size-3.5" />
+              </span>
+              {highlight}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="rounded-2xl bg-ink-50 p-5">
+        <h3 class={labelClass}>Pack sizes and MRP</h3>
+        <ul class="mt-2 space-y-1.5">
+          {data.variants.map(({ label, pack, mrp }) => (
+            <li class="flex items-baseline justify-between gap-4">
+              <span>
+                <span class="text-lg font-bold text-navy-900">{label}</span>
+                <span class="ml-2 text-sm text-ink-600">{pack}</span>
+              </span>
+              <span class="text-2xl font-bold tracking-tight text-navy-900 tabular-nums">
+                {formatMrp(mrp)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-2 text-xs text-ink-600">
+          {data.alsoPackedIn.length > 0 && `Also packed in ${data.alsoPackedIn.join(', ')}. `}
+          MRP inclusive of all taxes.
+        </p>
+      </div>
+
+      <dl class="grid grid-cols-3 gap-x-4 gap-y-1.5 text-sm">
+        {specs.map(({ label, value }) => (
+          <>
+            <dt class="text-ink-500">{label}</dt>
+            <dd class="col-span-2 font-semibold text-navy-900">{value}</dd>
+          </>
+        ))}
+      </dl>
+    </div>
+  </div>
+
+  <div class="mt-6 space-y-2 text-sm leading-6 text-ink-700">
+    {data.description.map((paragraph) => (
+      <p>{paragraph}</p>
+    ))}
+  </div>
+
+  <div class="mt-6">
+    {closing === 'benefits' && (
+      <div class="rounded-2xl bg-ink-50 p-5">
+        <h3 class="text-lg font-bold text-navy-900">
+          Key benefits{' '}
+          <span lang="hi" class="ml-1 text-sm font-medium text-ink-500">
+            फ़ायदे
+          </span>
+        </h3>
+        <ul class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2">
+          {data.benefits.map((benefit) => (
+            <li class="flex items-center gap-2 text-sm font-semibold text-navy-900">
+              <span class={checkClass}>
+                <Icon name="check" class="size-3.5" />
+              </span>
+              {benefit}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {closing === 'features' && <CatalogueFeatures features={data.features} />}
+    {closing === 'usage' && <CatalogueUsage steps={data.howToUse} />}
+  </div>
+</Sheet>

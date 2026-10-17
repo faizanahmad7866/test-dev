@@ -1,10 +1,13 @@
 ---
 /**
- * Products page opening: an editorial title on white, then the range photograph full-bleed
- * with a caption, the way a printed catalogue opens. The photo is the LCP element, so the
- * page hands in a pre-built image it also preloads.
+ * Products page opening: one band in the colours of the range studio shot, holding the
+ * title, the introduction and the photo itself. The photo has no frame: its edges fade into
+ * the band and its floor into the page, so it reads as part of the page rather than a
+ * picture placed on it. Full-bleed on phones, where every pixel of width counts.
+ * The photo is the LCP element, so the page hands in a pre-built image it also preloads.
  */
 import type { GetImageResult } from 'astro';
+import Breadcrumbs from '@/components/layout/Breadcrumbs.astro';
 import Container from '@/components/ui/Container.astro';
 
 interface Props {
@@ -15,44 +18,29 @@ interface Props {
 const { banner, sizes } = Astro.props;
 ---
 
-<section aria-labelledby="products-title" class="pt-8 lg:pt-12">
+<section aria-labelledby="products-title" class="bg-studio pt-6 lg:pt-10">
   <Container>
-    <nav aria-label="Breadcrumb">
-      <ol class="flex items-center gap-2 text-sm text-ink-500">
-        <li>
-          <a href="/" class="transition-colors hover:text-ink-950">
-            Home
-          </a>
-        </li>
-        <li aria-hidden="true">/</li>
-        <li>
-          <a href="/products/" aria-current="page" class="text-ink-950">
-            Products
-          </a>
-        </li>
-      </ol>
-    </nav>
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Products', href: '/products/' },
+      ]}
+    />
 
-    <div class="mt-14 grid gap-8 lg:mt-20 lg:grid-cols-12 lg:items-end">
-      <div class="lg:col-span-7">
-        <p lang="hi" class="text-lg font-medium text-brand-700">
-          उत्पाद
-        </p>
-        <h1
-          id="products-title"
-          class="mt-2 text-5xl font-semibold tracking-tight text-ink-950 sm:text-7xl lg:text-8xl"
-        >
-          The Dinar range
-        </h1>
-      </div>
-      <p class="max-w-md text-lg leading-8 text-pretty text-ink-600 lg:col-span-5 lg:justify-self-end">
-        Dinar makes detergent powder and detergent cake for everyday laundry. This is the full
-        range, with every pack size and its MRP.
+    <div class="mt-8 grid gap-4 lg:mt-10 lg:grid-cols-12 lg:items-end lg:gap-10">
+      <h1
+        id="products-title"
+        class="text-4xl font-bold tracking-tight text-navy-900 sm:text-5xl lg:col-span-7 lg:text-6xl"
+      >
+        Our products
+      </h1>
+      <p class="text-lg text-pretty text-ink-700 lg:col-span-5">
+        Detergent powder and detergent cake for everyday laundry. Every pack size, with its MRP.
       </p>
     </div>
   </Container>
 
-  <figure class="mx-auto mt-12 w-full max-w-cinema lg:mt-16">
+  <figure class="mx-auto mt-4 max-w-6xl sm:mt-6">
     {/* getImage + <img> rather than <Image>: the same srcset must also feed the head preload. */}
     <img
       src={banner.src}
@@ -60,15 +48,15 @@ const { banner, sizes } = Astro.props;
       sizes={sizes}
       width={banner.attributes['width']}
       height={banner.attributes['height']}
-      alt="The Dinar range on a deep blue backdrop with coloured ribbons and water droplets"
+      alt="The Dinar range on a pale blue studio backdrop: two Detergent Powder packs, Super Wash and Detergent Cake"
       loading="eager"
       fetchpriority="high"
       decoding="async"
-      class="h-auto w-full"
+      class="h-auto w-full mask-x-from-90% mask-t-from-90% mask-b-from-80%"
     />
     <Container>
-      <figcaption class="mt-4 text-sm text-ink-500">
-        From left: Detergent Cake, two Detergent Powder packs and Super Wash.
+      <figcaption class="text-center text-sm text-ink-600">
+        From left: two Detergent Powder packs, Super Wash and, in front, Detergent Cake.
       </figcaption>
     </Container>
   </figure>

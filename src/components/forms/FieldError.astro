@@ -3,8 +3,6 @@
  * Empty, hidden error line for one field. Form scripts find it by `data-error-for`, write the
  * message into `data-error-text` and unhide it; the id is what inputs reference in aria-describedby.
  */
-import Icon from '@/components/ui/Icon.astro';
-
 interface Props {
   id: string;
   name: string;
@@ -13,12 +11,6 @@ interface Props {
 const { id, name } = Astro.props;
 ---
 
-<p
-  id={id}
-  data-error-for={name}
-  hidden
-  class="mt-2 flex items-start gap-1.5 text-sm font-semibold text-brand-700"
->
-  <Icon name="circle-alert" class="mt-0.5 size-4" />
+<p id={id} data-error-for={name} hidden class="mt-2 text-sm font-medium text-brand-700">
   <span data-error-text></span>
 </p>

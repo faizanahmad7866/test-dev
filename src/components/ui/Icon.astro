@@ -5,18 +5,7 @@
  */
 import Check from '@lucide/astro/icons/check';
 import ChevronDown from '@lucide/astro/icons/chevron-down';
-import CircleAlert from '@lucide/astro/icons/circle-alert';
-import CircleCheck from '@lucide/astro/icons/circle-check';
-import FileText from '@lucide/astro/icons/file-text';
-import LoaderCircle from '@lucide/astro/icons/loader-circle';
-import Lock from '@lucide/astro/icons/lock';
-import MapPin from '@lucide/astro/icons/map-pin';
-import Package from '@lucide/astro/icons/package';
-import Phone from '@lucide/astro/icons/phone';
-import PhoneCall from '@lucide/astro/icons/phone-call';
-import Store from '@lucide/astro/icons/store';
-import Truck from '@lucide/astro/icons/truck';
-import User from '@lucide/astro/icons/user';
+import Download from '@lucide/astro/icons/download';
 import type { IconName } from '@/lib/icon-names';
 
 interface Props {
@@ -27,19 +16,8 @@ interface Props {
 const ICONS = {
   check: Check,
   'chevron-down': ChevronDown,
-  'circle-alert': CircleAlert,
-  'circle-check': CircleCheck,
-  'file-text': FileText,
-  'loader-circle': LoaderCircle,
-  lock: Lock,
-  'map-pin': MapPin,
-  package: Package,
-  phone: Phone,
-  'phone-call': PhoneCall,
-  store: Store,
-  truck: Truck,
-  user: User,
-} satisfies Record<IconName, typeof Check>;
+  download: Download,
+} satisfies Record<IconName, typeof ChevronDown>;
 
 const { name, class: className = 'size-5' } = Astro.props;
 const Component = ICONS[name];

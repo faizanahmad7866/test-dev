@@ -1,6 +1,6 @@
 ---
 /**
- * Dealer enquiry form and its success panel. Field names match dealerLeadSchema exactly;
+ * Dealer application form and its confirmation. Field names match dealerLeadSchema exactly;
  * src/scripts/dealer-lead-form.ts validates, submits and swaps the two.
  */
 import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
@@ -10,13 +10,12 @@ import FieldLabel from '@/components/forms/FieldLabel.astro';
 import FormStep from '@/components/forms/FormStep.astro';
 import SelectField from '@/components/forms/SelectField.astro';
 import TextField from '@/components/forms/TextField.astro';
-import ArrowIcon from '@/components/ui/ArrowIcon.astro';
-import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { site } from '@/config/site';
 import type { Product } from '@/content.config';
 import { BUSINESS_TYPES, MONTHLY_VOLUMES, YEARS_IN_BUSINESS } from '@/data/dealer-form-options';
 import { INDIAN_STATES } from '@/data/indian-states';
+import { buildWhatsAppUrl } from '@/lib/whatsapp';
 import { formatPhone } from '@/lib/format-phone';
 import { MESSAGE_MAX_LENGTH } from '@/lib/schemas/dealer-lead';
 
@@ -30,51 +29,59 @@ const productChoices = products.map(({ id, data }) => ({
   value: id,
   label: data.name,
   description: data.variants.map(({ label }) => label).join(' · '),
-  image: data.variants.find((variant) => variant.id === data.defaultVariant)?.image,
 }));
 const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state }));
+const whatsappNumber = formatPhone(site.whatsappNumber);
+// The plain chat until the script swaps in the link carrying the application.
+const whatsappChatUrl = buildWhatsAppUrl(site.whatsappNumber, '');
+const productNames = JSON.stringify(
+  Object.fromEntries(products.map(({ id, data }) => [id, data.name])),
+);
 ---
 
-<div
-  data-js="dealer-lead-card"
-  class="scroll-mt-28 rounded-3xl bg-white p-6 shadow-card ring-1 ring-ink-200 sm:p-10"
->
+<div data-js="dealer-lead-card" class="scroll-mt-28">
+  {/* POST and a disabled submit until the script is ready: if the script ever fails to load,
+      the browser cannot fall back to a GET that puts the visitor's details in the URL. */}
   <form
+    method="post"
     data-js="dealer-lead-form"
     data-turnstile-site-key={PUBLIC_TURNSTILE_SITE_KEY}
-    data-support-phone={supportPhone}
+    data-whatsapp-number={site.whatsappNumber}
+    data-product-names={productNames}
     aria-labelledby="dealer-form-title"
-    class="space-y-8"
+    class="space-y-12"
   >
     <div>
       <h2
         id="dealer-form-title"
-        class="text-2xl font-extrabold tracking-tight text-navy-900 sm:text-3xl"
+        class="text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl"
       >
-        Dealer enquiry
+        Dealer application{' '}
+        <span lang="hi" class="ml-1 text-lg font-medium tracking-normal text-ink-500">
+          डीलर आवेदन
+        </span>
       </h2>
-      <p class="mt-2 text-sm text-ink-600">
-        Fields marked <span class="font-bold text-brand-700">*</span> are required.
+      <p class="mt-3 text-sm text-ink-600">
+        Fields marked <span class="text-brand-700">*</span> are required.
       </p>
+
+      <noscript>
+        <p class="mt-6 rounded-xl bg-ink-50 px-4 py-3 text-sm font-medium text-navy-900">
+          This form needs JavaScript to keep spam out. You can also call us on {supportPhone}.
+        </p>
+      </noscript>
+
+      <div
+        data-js="form-alert"
+        role="alert"
+        hidden
+        class="mt-6 rounded-xl bg-brand-50 px-4 py-3 text-sm font-medium text-brand-900"
+      >
+        <span data-alert-text></span>
+      </div>
     </div>
 
-    <noscript>
-      <p class="rounded-2xl bg-mist-50 p-4 text-sm font-semibold text-navy-900 ring-1 ring-mist-200">
-        This form needs JavaScript to keep spam out. You can also call us on {supportPhone}.
-      </p>
-    </noscript>
-
-    <div
-      data-js="form-alert"
-      role="alert"
-      hidden
-      class="flex items-start gap-3 rounded-2xl bg-brand-50 p-4 text-sm font-semibold text-brand-900 ring-1 ring-brand-200"
-    >
-      <Icon name="circle-alert" class="mt-0.5 size-5 text-brand-700" />
-      <span data-alert-text></span>
-    </div>
-
-    <FormStep step={1} title="Your details" icon="user">
+    <FormStep step={1} title="Contact details" titleHi="संपर्क">
       <TextField name="fullName" label="Full name" isRequired autocomplete="name" maxlength={80} />
       <TextField
         name="phone"
@@ -85,7 +92,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
         autocomplete="tel-national"
         inputmode="tel"
         maxlength={16}
-        hint="10-digit number. Our team will call you on this."
+        hint="We will call you on this number."
       />
       <TextField
         name="email"
@@ -97,7 +104,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
       />
     </FormStep>
 
-    <FormStep step={2} title="Your business" icon="store">
+    <FormStep step={2} title="Business" titleHi="व्यापार">
       <TextField
         name="businessName"
         label="Shop or firm name"
@@ -108,7 +115,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
       />
       <ChoiceGroup
         name="businessType"
-        legend="Business type"
+        legend="Type of business"
         type="radio"
         options={BUSINESS_TYPES}
         isRequired
@@ -121,7 +128,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
         autocomplete="off"
         maxlength={17}
         placeholder="22AAAAA0000A1Z5"
-        hint="15 characters, from your GST certificate."
+        hint="15 characters, as on your GST certificate."
       />
       <SelectField
         name="yearsInBusiness"
@@ -131,7 +138,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
       />
     </FormStep>
 
-    <FormStep step={3} title="Location" icon="map-pin">
+    <FormStep step={3} title="Location" titleHi="स्थान">
       <SelectField
         name="state"
         label="State"
@@ -157,7 +164,7 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
       />
     </FormStep>
 
-    <FormStep step={4} title="Your requirement" icon="package">
+    <FormStep step={4} title="Requirement" titleHi="आवश्यकता">
       <ChoiceGroup
         name="products"
         legend="Products you want to stock"
@@ -179,13 +186,13 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
           rows="4"
           maxlength={MESSAGE_MAX_LENGTH}
           aria-describedby="field-message-count field-message-error"
-          placeholder="Anything we should know — areas you cover, a good time to call…"
-          class="mt-2 block w-full resize-y rounded-xl bg-white px-4 py-3 text-base text-navy-900 ring-1 ring-ink-300 transition-shadow placeholder:text-ink-500 hover:ring-ink-500 focus:ring-2 focus:ring-ocean-600 focus:outline-none aria-invalid:ring-2 aria-invalid:ring-brand-700 motion-reduce:transition-none"
+          placeholder="Areas you cover, brands you stock today, a good time to call"
+          class="mt-2 block w-full resize-y rounded-xl border border-ink-300 bg-white px-3.5 py-3 text-base text-navy-900 transition-colors placeholder:text-ink-400 hover:border-ink-500 focus:border-navy-900 focus:ring-1 focus:ring-navy-900 focus:outline-none aria-invalid:border-brand-700 aria-invalid:ring-1 aria-invalid:ring-brand-700 motion-reduce:transition-none"
         ></textarea>
         <p
           id="field-message-count"
           data-js="message-counter"
-          class="mt-1.5 text-right text-xs text-ink-500 tabular-nums"
+          class="mt-2 text-right text-xs text-ink-500 tabular-nums"
         >
           0 / {MESSAGE_MAX_LENGTH.toLocaleString('en-IN')}
         </p>
@@ -193,75 +200,94 @@ const stateOptions = INDIAN_STATES.map((state) => ({ value: state, label: state 
       </div>
     </FormStep>
 
-    <div class="border-t border-ink-200 pt-8">
-      <label class="flex cursor-pointer items-start gap-3 rounded-2xl bg-mist-50 p-4 ring-1 ring-mist-200 has-aria-invalid:ring-2 has-aria-invalid:ring-brand-700">
+    <div class="rounded-2xl bg-ink-50 p-5 sm:p-6">
+      <label class="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"
           name="consent"
           required
           aria-describedby="field-consent-error"
-          class="mt-0.5 size-5 shrink-0 cursor-pointer accent-navy-900"
+          class="mt-1 size-4 shrink-0 cursor-pointer accent-navy-900"
         />
-        <span class="text-sm text-ink-700">
-          I agree that Dinar may contact me by phone, WhatsApp or email about this enquiry.
-          <span class="font-bold text-brand-700" aria-hidden="true">
+        <span class="text-sm leading-6 font-medium text-navy-900">
+          I agree that Dinar may contact me by phone, WhatsApp or email about this application.
+          <span class="text-brand-700" aria-hidden="true">
             *
           </span>
         </span>
       </label>
       <FieldError id="field-consent-error" name="consent" />
-    </div>
 
-    <div aria-hidden="true" class="sr-only">
-      <label for="field-website">Leave this field empty</label>
-      <input id="field-website" name="website" type="text" tabindex="-1" autocomplete="off" />
-    </div>
+      <div aria-hidden="true" class="sr-only">
+        <label for="field-website">Leave this field empty</label>
+        <input id="field-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
 
-    <div data-js="turnstile"></div>
+      <div data-js="turnstile" class="mt-6"></div>
 
-    <div class="flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
-      <p class="flex items-center gap-2 text-sm text-ink-500">
-        <Icon name="lock" class="size-4" />
-        Protected from spam by Cloudflare Turnstile.
-      </p>
-      <button
-        type="submit"
-        class="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-brand-700 px-8 text-base font-semibold text-white shadow-cta transition-colors hover:bg-brand-800 active:bg-brand-900 disabled:cursor-wait disabled:bg-brand-800 sm:w-auto motion-reduce:transition-none"
-      >
-        <span data-submit-label>Submit enquiry</span>
-        <Icon
-          name="loader-circle"
-          class="hidden size-5 animate-spin group-aria-busy:block motion-reduce:animate-none"
-        />
-        <ArrowIcon class="transition-transform group-hover:translate-x-0.5 group-aria-busy:hidden motion-reduce:transition-none" />
-      </button>
+      <div class="mt-8 flex flex-col-reverse gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <p class="max-w-sm text-xs leading-5 text-ink-600">
+          WhatsApp opens with your application ready to send to the Dinar team on{' '}
+          <span class="font-semibold whitespace-nowrap text-navy-900 tabular-nums">
+            {whatsappNumber}
+          </span>
+          . Protected from spam by Cloudflare Turnstile.
+        </p>
+        <button
+          type="submit"
+          disabled
+          class="inline-flex h-13 w-full items-center justify-center rounded-full bg-brand-700 px-7 text-base font-bold text-white transition active:translate-y-px hover:bg-brand-800 active:bg-brand-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto motion-reduce:transition-none"
+        >
+          Submit on WhatsApp
+        </button>
+      </div>
     </div>
   </form>
 
-  <div data-js="dealer-lead-success" hidden class="py-6 text-center text-navy-900 sm:py-10">
-    <span class="mx-auto grid size-16 place-items-center rounded-full bg-navy-50 ring-8 ring-mist-50">
-      <Icon name="circle-check" class="size-8" />
+  <div data-js="dealer-lead-success" hidden>
+    <span class="grid size-12 place-items-center rounded-full bg-brand-50 text-brand-700">
+      <Icon name="check" class="size-6" />
     </span>
+    <p class="mt-6 font-semibold text-brand-700">
+      Opened in WhatsApp{' '}
+      <span lang="hi" class="ml-1 font-medium text-ink-500">
+        व्हाट्सऐप में खुला
+      </span>
+    </p>
     <h2
       data-success-heading
       tabindex="-1"
-      class="mt-6 text-2xl font-extrabold tracking-tight focus:outline-none sm:text-3xl"
+      class="mt-2 text-4xl font-bold tracking-tight text-navy-900 focus:outline-none sm:text-5xl"
     >
-      Thank you — your enquiry is in
+      Now press Send in WhatsApp
     </h2>
-    <p class="mx-auto mt-3 max-w-md text-ink-600">
-      Our team will contact you on <strong data-success-phone class="text-navy-900"></strong>.
+    <p class="mt-4 max-w-lg text-lg text-ink-600">
+      Your application is written out in WhatsApp, in a new tab, addressed to the Dinar team on{' '}
+      <span class="font-bold whitespace-nowrap text-navy-900 tabular-nums">{whatsappNumber}</span>
+      {'. Press Send there to deliver it. We will call you on '}
+      <span
+        data-success-phone
+        class="font-bold whitespace-nowrap text-navy-900 tabular-nums"
+      ></span>
+      {'.'}
     </p>
-    <div class="mx-auto mt-8 inline-flex flex-col items-center rounded-2xl bg-mist-50 px-8 py-4 ring-1 ring-mist-200">
-      <p class="text-xs font-bold tracking-widest text-ink-500 uppercase">Your reference</p>
-      <p data-success-reference class="mt-1 text-xl font-extrabold tracking-wider tabular-nums"></p>
+    <div data-success-reference-block hidden class="mt-8 max-w-md rounded-2xl bg-ink-50 p-5">
+      <p class="text-sm text-ink-600">Your reference</p>
+      <p data-success-reference class="mt-1 font-mono text-lg font-semibold text-navy-900"></p>
+      <p class="mt-2 text-xs text-ink-600">Quote it if you call us on {supportPhone}.</p>
     </div>
-    <p class="mt-3 text-sm text-ink-500">Quote it if you call us on {supportPhone}.</p>
-    <div class="mt-8">
-      <Button href="/products/" variant="outline">
-        Explore products
-      </Button>
-    </div>
+    <p class="mt-8 text-sm text-ink-600">
+      WhatsApp did not open?{' '}
+      <a
+        href={whatsappChatUrl}
+        target="_blank"
+        rel="noopener"
+        data-success-whatsapp
+        class="font-bold text-navy-900 underline underline-offset-4 transition-colors hover:text-brand-700"
+      >
+        Open it again
+      </a>
+    </p>
   </div>
 </div>
 

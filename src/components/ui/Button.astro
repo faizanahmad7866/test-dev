@@ -1,40 +1,28 @@
 ---
 /**
- * Call-to-action link. Always renders an <a>: every CTA on this site navigates.
- * - primary: brand-700, not the logo red, so white label text clears WCAG AA.
- * - light: white pill for red or navy backgrounds.
- * - outline: hairline pill that inherits the surrounding text colour (works on light and dark).
+ * Call-to-action link: an <a> styled as a pill (see lib/button-classes for the variants).
  * `class` is for layout only (width, margin). Toggle visibility on a wrapper — a `hidden`
  * passed here loses to the built-in `inline-flex`.
  */
-import ArrowIcon from '@/components/ui/ArrowIcon.astro';
+import { buttonClasses, type ButtonSize, type ButtonVariant } from '@/lib/button-classes';
 
 interface Props {
   href: string;
-  variant?: 'primary' | 'light' | 'outline';
-  size?: 'md' | 'lg';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  /** Open in a new tab, for hand-offs such as WhatsApp that should leave this page open. */
+  newTab?: boolean;
   class?: string;
 }
 
-const { href, variant = 'primary', size = 'md', class: className } = Astro.props;
-
-const VARIANT_CLASSES = {
-  primary: 'bg-brand-700 text-white shadow-cta hover:bg-brand-800 active:bg-brand-900',
-  light: 'bg-white text-navy-900 shadow-lg hover:bg-mist-50 active:bg-mist-100',
-  outline:
-    'border border-current/30 hover:border-current/60 hover:bg-current/5 active:bg-current/10',
-} as const;
+const { href, variant = 'primary', size = 'md', newTab = false, class: className } = Astro.props;
 ---
 
 <a
   href={href}
-  class:list={[
-    'group inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors',
-    VARIANT_CLASSES[variant],
-    size === 'md' ? 'h-11 px-5 text-sm' : 'h-14 px-7 text-base',
-    className,
-  ]}
+  target={newTab ? '_blank' : undefined}
+  rel={newTab ? 'noopener' : undefined}
+  class:list={[buttonClasses(variant, size), className]}
 >
   <slot />
-  <ArrowIcon class="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none" />
 </a>

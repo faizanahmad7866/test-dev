@@ -9,49 +9,19 @@ import * as z from 'zod/mini';
 // Relative, not `@/`: this module is bundled into Cloudflare Functions too (rules.md §1).
 import { BUSINESS_TYPES, MONTHLY_VOLUMES, YEARS_IN_BUSINESS } from '../../data/dealer-form-options';
 import { INDIAN_STATES } from '../../data/indian-states';
+import { cleaned, firstErrorPerField, mobileNumber, pinCode, requiredText } from './fields';
+
+export { normalisePhone } from './fields';
 
 export const DEALER_LEAD_ENDPOINT = '/api/dealer-lead';
 export const MESSAGE_MAX_LENGTH = 1000;
 
 const GSTIN_PATTERN = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
-const MOBILE_PATTERN = /^[6-9]\d{9}$/;
-const PINCODE_PATTERN = /^[1-9]\d{5}$/;
 const PRODUCT_ID_PATTERN = /^[a-z0-9-]{1,60}$/;
-const PHONE_ERROR = 'Enter a 10-digit mobile number';
-const PINCODE_ERROR = 'Enter a 6-digit PIN code';
 const emailSchema = z.email();
-
-/** "  Ram   Traders " → "Ram Traders". */
-const collapseSpaces = (value: string): string => value.replace(/\s+/g, ' ').trim();
-
-/**
- * Reduces any common way of typing an Indian mobile number to its 10 digits:
- * "+91 98765-43210", "098765 43210" and "9876543210" all become "9876543210".
- */
-export function normalisePhone(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  if (digits.length === 12 && digits.startsWith('91')) return digits.slice(2);
-  if (digits.length === 11 && digits.startsWith('0')) return digits.slice(1);
-  return digits;
-}
 
 const optionValues = (options: readonly { value: string }[]): string[] =>
   options.map(({ value }) => value);
-
-/** A string cleaned by `clean` first, then checked — so rules always see normalised input. */
-const cleaned = (clean: (value: string) => string, error?: string) =>
-  z.pipe(z.string(error ? { error } : undefined), z.transform(clean));
-
-const requiredText = (error: string, max: number) =>
-  z.pipe(
-    cleaned(collapseSpaces, error),
-    z
-      .string()
-      .check(
-        z.minLength(2, { error }),
-        z.maxLength(max, { error: `Keep this under ${max} characters` }),
-      ),
-  );
 
 /** A select left on its placeholder sends "", which is a valid answer for optional questions. */
 const optionalChoice = (options: readonly { value: string }[]) =>
@@ -63,10 +33,7 @@ const optionalChoice = (options: readonly { value: string }[]) =>
 
 export const dealerLeadSchema = z.object({
   fullName: requiredText('Enter your full name', 80),
-  phone: z.pipe(
-    cleaned(normalisePhone, PHONE_ERROR),
-    z.string().check(z.regex(MOBILE_PATTERN, { error: PHONE_ERROR })),
-  ),
+  phone: mobileNumber(),
   email: z.pipe(
     cleaned((value) => value.trim().toLowerCase()),
     z.string().check(
@@ -88,10 +55,7 @@ export const dealerLeadSchema = z.object({
   yearsInBusiness: optionalChoice(YEARS_IN_BUSINESS),
   state: z.enum(INDIAN_STATES, { error: 'Choose your state' }),
   city: requiredText('Enter your city or district', 80),
-  pincode: z.pipe(
-    cleaned((value) => value.replace(/\D/g, ''), PINCODE_ERROR),
-    z.string().check(z.regex(PINCODE_PATTERN, { error: PINCODE_ERROR })),
-  ),
+  pincode: pinCode(),
   products: z
     .array(z.string().check(z.regex(PRODUCT_ID_PATTERN)), { error: 'Choose at least one product' })
     .check(z.minLength(1, { error: 'Choose at least one product' }), z.maxLength(10)),
@@ -120,12 +84,7 @@ export function isDealerLeadField(name: unknown): name is DealerLeadField {
 export function getFieldErrors(error: {
   issues: readonly { path: readonly PropertyKey[]; message: string }[];
 }): FieldErrors {
-  const fieldErrors: FieldErrors = {};
-  for (const issue of error.issues) {
-    const [field] = issue.path;
-    if (isDealerLeadField(field) && !fieldErrors[field]) fieldErrors[field] = issue.message;
-  }
-  return fieldErrors;
+  return firstErrorPerField(error, isDealerLeadField);
 }
 
 /** What the browser posts: the lead plus anti-spam fields that never reach storage. */

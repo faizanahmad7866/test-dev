@@ -1,0 +1,31 @@
+---
+/**
+ * Kabir Industries' logo, the company behind the Dinar brand. A transparent cut of the
+ * client's artwork, so it sits on white and on the grey footer alike.
+ * - sm: the footer's "A brand of" line, small like a parent-company mark.
+ * - md: the contact page's company information.
+ */
+import { Image } from 'astro:assets';
+import logo from '@/assets/brand/kabir-industries-logo.png';
+import { site } from '@/config/site';
+
+interface Props {
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const { size = 'sm', class: className } = Astro.props;
+const SIZES = {
+  sm: { class: 'h-8', widths: [104, 208, 312], sizes: '104px' },
+  md: { class: 'h-14 sm:h-16', widths: [208, 416, 624], sizes: '208px' },
+} as const;
+const { class: sizeClass, widths, sizes } = SIZES[size];
+---
+
+<Image
+  src={logo}
+  alt={site.company.legalName}
+  widths={[...widths]}
+  sizes={sizes}
+  class:list={['w-auto', sizeClass, className]}
+/>

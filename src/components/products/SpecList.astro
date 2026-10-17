@@ -1,0 +1,32 @@
+---
+/**
+ * A pack's facts on a soft panel: muted labels, bold values, no ruled lines. The MRP closes
+ * the list, set large because it is what a shopkeeper or customer looks for first.
+ */
+import { formatMrp } from '@/lib/format-mrp';
+
+interface Props {
+  rows: { label: string; value: string }[];
+  mrp: number;
+}
+
+const { rows, mrp } = Astro.props;
+---
+
+<div class="rounded-2xl bg-ink-50 p-6 sm:p-7">
+  <dl class="grid grid-cols-3 gap-x-4 gap-y-3 text-sm">
+    {rows.map(({ label, value }) => (
+      <>
+        <dt class="text-ink-500">{label}</dt>
+        <dd class="col-span-2 font-semibold text-navy-900">{value}</dd>
+      </>
+    ))}
+  </dl>
+  <p class="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <span class="text-sm font-semibold text-ink-500">MRP</span>
+    <span class="text-3xl font-bold tracking-tight text-navy-900 tabular-nums">
+      {formatMrp(mrp)}
+    </span>
+    <span class="text-xs text-ink-500">Inclusive of all taxes</span>
+  </p>
+</div>

@@ -1,0 +1,85 @@
+---
+/**
+ * The printable product catalogue, built from the same data as the site. `pnpm catalogue`
+ * prints this page to public/downloads/dinar-product-catalogue.pdf; it is not linked from
+ * the site and is kept out of search.
+ * Pages: cover, the range at a glance, one or two pages per product, safety and dealership,
+ * back cover. Page numbers are worked out here so the contents can point to them.
+ */
+import { getCollection } from 'astro:content';
+import BackCoverSheet from '@/components/catalogue/BackCoverSheet.astro';
+import CoverSheet from '@/components/catalogue/CoverSheet.astro';
+import DealerSheet from '@/components/catalogue/DealerSheet.astro';
+import ProductDetailSheet from '@/components/catalogue/ProductDetailSheet.astro';
+import ProductOverviewSheet from '@/components/catalogue/ProductOverviewSheet.astro';
+import RangeSheet from '@/components/catalogue/RangeSheet.astro';
+import { site } from '@/config/site';
+import CatalogueLayout from '@/layouts/CatalogueLayout.astro';
+import { catalogueEdition } from '@/lib/catalogue';
+import { listSkus } from '@/lib/product-skus';
+
+const collection = await getCollection('products');
+const products = collection.sort((a, b) => a.data.order - b.data.order);
+const skus = listSkus(collection);
+const edition = catalogueEdition();
+
+// How each product fills its pages, from what data it has: benefits and features need two
+// pages; features alone go on the overview, with a usage page after; neither fits on one.
+const FIRST_PRODUCT_PAGE = 3;
+let nextPage = FIRST_PRODUCT_PAGE;
+const productPages = products.map((product) => {
+  const { benefits, features } = product.data;
+  const closing = benefits.length > 0 ? 'benefits' : features.length > 0 ? 'features' : 'usage';
+  const detail =
+    closing === 'benefits'
+      ? 'features-and-usage'
+      : closing === 'features'
+        ? 'usage-and-order'
+        : null;
+  const overviewPage = nextPage;
+  nextPage += detail ? 2 : 1;
+  return { product, closing, detail, overviewPage } as const;
+});
+const dealerPage = nextPage;
+const total = dealerPage + 1;
+const pageOf = Object.fromEntries(
+  productPages.map(({ product, overviewPage }) => [product.id, overviewPage]),
+);
+const alsoPackedIn = products
+  .filter(({ data }) => data.alsoPackedIn.length > 0)
+  .map(({ data }) => ({ name: data.name, sizes: data.alsoPackedIn }));
+---
+
+<CatalogueLayout title={`${site.name} Product Catalogue, ${edition}`}>
+  <CoverSheet skus={skus} productCount={products.length} edition={edition} />
+  <RangeSheet
+    skus={skus}
+    pageOf={pageOf}
+    alsoPackedIn={alsoPackedIn}
+    page={2}
+    total={total}
+    edition={edition}
+  />
+  {productPages.map(({ product, closing, detail, overviewPage }) => (
+    <>
+      <ProductOverviewSheet
+        product={product}
+        closing={closing}
+        page={overviewPage}
+        total={total}
+        edition={edition}
+      />
+      {detail && (
+        <ProductDetailSheet
+          product={product}
+          content={detail}
+          page={overviewPage + 1}
+          total={total}
+          edition={edition}
+        />
+      )}
+    </>
+  ))}
+  <DealerSheet page={dealerPage} total={total} edition={edition} />
+  <BackCoverSheet edition={edition} />
+</CatalogueLayout>

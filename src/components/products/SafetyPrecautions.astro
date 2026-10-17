@@ -1,0 +1,44 @@
+---
+/**
+ * "Safety & storage", set like the caution panel on the back of a pack: the children
+ * warning first and in bold, then each precaution under a short topic label, on the same
+ * soft panel and label/value grid as the pack's specifications.
+ */
+import { SAFETY_LEAD, SAFETY_PRECAUTIONS } from '@/data/safety-precautions';
+---
+
+<section aria-labelledby="safety-title" class="grid gap-6 lg:grid-cols-12 lg:gap-14">
+  <div class="lg:col-span-4">
+    <p class="text-sm font-bold tracking-wide text-brand-700 uppercase">
+      Caution{' '}
+      <span lang="hi" class="ml-1 font-semibold tracking-normal normal-case">
+        सावधानी
+      </span>
+    </p>
+    <h2 id="safety-title" class="mt-2 text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+      Safety &amp; storage
+    </h2>
+    <p class="mt-3 text-ink-600">Please read before use.</p>
+  </div>
+
+  <div class="reveal rounded-2xl bg-ink-50 p-6 sm:p-8 lg:col-span-8">
+    <p class="text-lg font-bold text-navy-900 sm:text-xl">{SAFETY_LEAD.en}</p>
+    <p lang="hi" class="mt-1 text-ink-600">
+      {SAFETY_LEAD.hi}
+    </p>
+
+    <dl class="mt-6 grid gap-x-6 gap-y-5 sm:grid-cols-4">
+      {SAFETY_PRECAUTIONS.map(({ topic, en, hi }) => (
+        <>
+          <dt class="text-sm font-semibold text-ink-500 sm:pt-0.5">{topic}</dt>
+          <dd class="-mt-4 sm:col-span-3 sm:mt-0">
+            <p class="font-semibold text-navy-900">{en}</p>
+            <p lang="hi" class="mt-0.5 text-sm text-ink-600">
+              {hi}
+            </p>
+          </dd>
+        </>
+      ))}
+    </dl>
+  </div>
+</section>

@@ -1,47 +1,54 @@
 ---
 /**
- * A product's formula features, grouped by what they do for the wash. Set as a typographic
- * list in three columns: the words carry it, so there are no icons to compete with them.
+ * A product's formula features, grouped by what they do for the wash: one white card per
+ * group, opened by the group's photo in a white-ringed circle beside its name, then each
+ * feature name in bold over its one-line explanation. The photo is decorative (empty alt).
  */
+import { Image } from 'astro:assets';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
 import type { ProductFeature } from '@/content.config';
+import { FEATURE_GROUP_VISUALS } from '@/data/feature-group-visuals';
 import { FEATURE_GROUP_IDS, FEATURE_GROUP_LABELS } from '@/data/feature-groups';
 
 interface Props {
-  productId: string;
   features: ProductFeature[];
 }
 
-const { productId, features } = Astro.props;
-const headingId = `${productId}-features`;
+const { features } = Astro.props;
 const groups = FEATURE_GROUP_IDS.map((id) => ({
   id,
   ...FEATURE_GROUP_LABELS[id],
+  image: FEATURE_GROUP_VISUALS[id],
   items: features.filter(({ group }) => group === id),
 })).filter(({ items }) => items.length > 0);
 ---
 
-<section aria-labelledby={headingId} class="mt-20 grid gap-10 lg:mt-28 lg:grid-cols-12">
-  <div class="lg:col-span-3">
-    <h3 id={headingId} class="text-2xl font-semibold tracking-tight text-ink-950">
-      What it does
-    </h3>
-    <p lang="hi" class="mt-1 text-ink-500">
-      ख़ूबियाँ
-    </p>
-  </div>
-  <div class="grid gap-10 sm:grid-cols-3 lg:col-span-9">
-    {groups.map(({ label, labelHi, items }) => (
-      <div>
-        <h4 class="flex items-baseline justify-between gap-3 border-b border-ink-950 pb-3 text-sm font-medium text-ink-950">
-          {label}{' '}
-          <span lang="hi" class="font-normal text-ink-500">
-            {labelHi}
-          </span>
-        </h4>
-        <ul class="divide-y divide-ink-200">
+<section aria-labelledby="features-title">
+  <SectionHeader id="features-title" title="What it does" />
+  <div class="mt-8 grid gap-4 md:grid-cols-3 lg:gap-6">
+    {groups.map(({ label, labelHi, image, items }) => (
+      <div class="reveal rounded-3xl bg-white p-6 sm:p-8">
+        <div class="flex items-center gap-4">
+          <div class="size-18 shrink-0 overflow-hidden rounded-full bg-white ring-4 ring-ink-100 sm:size-20">
+            <Image
+              src={image}
+              alt=""
+              widths={[144, 160, 240]}
+              sizes="(min-width: 640px) 80px, 72px"
+              class="size-full object-cover"
+            />
+          </div>
+          <h3 class="text-xl font-bold text-navy-900">
+            {label}{' '}
+            <span lang="hi" class="mt-0.5 block text-sm font-medium text-brand-700">
+              {labelHi}
+            </span>
+          </h3>
+        </div>
+        <ul class="mt-6 space-y-5">
           {items.map(({ title, description }) => (
-            <li class="py-4">
-              <p class="font-medium text-ink-950">{title}</p>
+            <li>
+              <p class="font-bold text-navy-900">{title}</p>
               <p class="mt-1 text-sm leading-6 text-ink-600">{description}</p>
             </li>
           ))}

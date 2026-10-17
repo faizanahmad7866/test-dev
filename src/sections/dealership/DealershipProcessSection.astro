@@ -1,0 +1,37 @@
+---
+/** How a dealer application moves, as three numbered cards. Text only. */
+import Container from '@/components/ui/Container.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+
+const STEPS = [
+  {
+    title: 'Apply',
+    description: 'Send the application below with your business details and the area you cover.',
+  },
+  {
+    title: 'Talk to the Dinar team',
+    description: 'We review every application and call you to discuss supply for your area.',
+  },
+  {
+    title: 'Start stocking',
+    description: 'Once everything is agreed, bring the Dinar range to your customers.',
+  },
+] as const;
+---
+
+<section aria-labelledby="process-title" class="pb-14 lg:pb-20">
+  <Container>
+    <SectionHeader id="process-title" title="How it works" />
+    <ol class="mt-8 grid gap-4 sm:grid-cols-3 lg:gap-6">
+      {STEPS.map(({ title, description }, index) => (
+        <li class="reveal rounded-3xl bg-ink-50 p-6 sm:p-8">
+          <span class="grid size-10 place-items-center rounded-full bg-brand-700 font-bold text-white tabular-nums">
+            {index + 1}
+          </span>
+          <p class="mt-5 text-xl font-bold text-navy-900">{title}</p>
+          <p class="mt-2 text-ink-600">{description}</p>
+        </li>
+      ))}
+    </ol>
+  </Container>
+</section>

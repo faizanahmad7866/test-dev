@@ -1,0 +1,99 @@
+---
+/**
+ * Home page only: a pack sold online, shown large. The pack on its studio backdrop beside
+ * its name, promise, size, two claims from the pack and the MRP, with "Shop now" (the
+ * product page's WhatsApp order panel) and "View details".
+ */
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import { buttonClasses } from '@/lib/button-classes';
+import { formatMrp } from '@/lib/format-mrp';
+import { packPhotoFit } from '@/lib/pack-photo';
+import { skuName, skuPath, type ProductSku } from '@/lib/product-skus';
+
+interface Props {
+  sku: ProductSku;
+}
+
+const { sku } = Astro.props;
+const { product, variant } = sku;
+const { data } = product;
+const href = skuPath(sku);
+const titleId = `featured-${sku.slug}`;
+const FEATURED_CLAIMS = 2;
+---
+
+<article
+  aria-labelledby={titleId}
+  class="group grid h-full overflow-hidden rounded-3xl bg-white transition duration-300 hover:-translate-y-1 sm:grid-cols-12 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  {/* Out of the tab order: the name and buttons below already lead to the same page. */}
+  <a
+    href={href}
+    tabindex="-1"
+    class="bg-stage relative block aspect-square overflow-hidden sm:col-span-5 sm:aspect-auto"
+  >
+    {/* The photo sits in an absolute layer, so the text column alone sets the card's height. */}
+    <span class="absolute inset-0 flex items-center justify-center p-8 lg:p-10">
+      <Image
+        src={variant.image}
+        alt={variant.imageAlt}
+        widths={[320, 480, 640, 800]}
+        sizes="(min-width: 1280px) 250px, (min-width: 640px) 40vw, 100vw"
+        class:list={[
+          'h-auto w-auto mask-x-from-85% mask-y-from-85% transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100',
+          packPhotoFit(variant),
+        ]}
+      />
+    </span>
+    <span class="absolute top-4 left-4 rounded-full bg-white px-3 py-1 text-xs font-bold text-navy-900">
+      Order on WhatsApp
+    </span>
+  </a>
+
+  <div class="flex flex-col p-6 sm:col-span-7 lg:p-8">
+    <p class="text-xs font-bold tracking-wide text-brand-700 uppercase">{data.category}</p>
+    <h3
+      id={titleId}
+      class="mt-2 text-2xl leading-tight font-bold tracking-tight text-navy-900 lg:text-3xl"
+    >
+      <a href={href} class="transition-colors hover:text-brand-700">
+        {data.name}
+      </a>
+    </h3>
+    {data.tagline && <p class="mt-2 text-sm text-pretty text-ink-600">{data.tagline}</p>}
+
+    <p class="mt-4">
+      <span class="inline-flex rounded-full bg-mist-100 px-3 py-1 text-sm font-bold text-navy-900">
+        {variant.label} {variant.pack.toLowerCase()}
+      </span>
+    </p>
+
+    <ul class="mt-4 space-y-2">
+      {data.highlights.slice(0, FEATURED_CLAIMS).map((claim) => (
+        <li class="flex items-center gap-2 text-sm font-semibold text-navy-900">
+          <span class="grid size-5 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700">
+            <Icon name="check" class="size-3.5" />
+          </span>
+          {claim}
+        </li>
+      ))}
+    </ul>
+
+    <p class="mt-6 lg:mt-auto lg:pt-6">
+      <span class="block text-3xl font-bold tracking-tight text-navy-900 tabular-nums">
+        {formatMrp(variant.mrp)}
+      </span>
+      <span class="mt-0.5 block text-xs font-medium text-ink-500">MRP, inclusive of all taxes</span>
+    </p>
+
+    <div class="mt-5 flex flex-wrap gap-2">
+      <a href={`${href}#order`} class={buttonClasses('primary', 'md')}>
+        Shop now <span class="sr-only">{skuName(sku)}</span>
+      </a>
+      <a href={href} class:list={[buttonClasses('outline', 'md'), 'text-navy-900']}>
+        View details <span class="sr-only">for {skuName(sku)}</span>
+      </a>
+    </div>
+  </div>
+</article>

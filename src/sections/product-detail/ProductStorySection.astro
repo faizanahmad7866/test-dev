@@ -1,0 +1,57 @@
+---
+/**
+ * The product in words, on a soft grey band: the description, the key benefits as a
+ * checklist card, then the formula features by group. Parts a product has no data for are
+ * simply left out.
+ */
+import CheckList from '@/components/products/CheckList.astro';
+import FeatureGroups from '@/components/products/FeatureGroups.astro';
+import Container from '@/components/ui/Container.astro';
+import type { Product } from '@/content.config';
+
+interface Props {
+  product: Product;
+}
+
+const { data } = Astro.props.product;
+---
+
+<section aria-labelledby="about-title" class="bg-ink-50 py-14 lg:py-20">
+  <Container>
+    <div class="grid gap-8 lg:grid-cols-12 lg:gap-14">
+      <div class="reveal lg:col-span-6">
+        <h2 id="about-title" class="text-3xl font-bold tracking-tight text-navy-900 sm:text-4xl">
+          About {data.name}
+        </h2>
+        <div class="mt-5 space-y-4 text-lg leading-8 text-pretty text-ink-700">
+          {data.description.map((paragraph) => (
+            <p>{paragraph}</p>
+          ))}
+        </div>
+      </div>
+
+      {data.benefits.length > 0 && (
+        <section
+          aria-labelledby="benefits-title"
+          class="reveal rounded-3xl bg-white p-6 sm:p-8 lg:col-span-6"
+        >
+          <h3 id="benefits-title" class="text-xl font-bold text-navy-900">
+            Key benefits{' '}
+            <span lang="hi" class="ml-1 font-medium text-ink-500">
+              फ़ायदे
+            </span>
+          </h3>
+          <div class="mt-5">
+            <CheckList items={data.benefits} columns={2} />
+          </div>
+        </section>
+      )}
+    </div>
+
+    {data.features.length > 0 && (
+      <div class="mt-14 lg:mt-20">
+        <FeatureGroups features={data.features} />
+      </div>
+    )}
+  </Container>
+</section>

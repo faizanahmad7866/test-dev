@@ -1,0 +1,64 @@
+---
+/**
+ * "How to use" for print, photo above a numbered caption. `row` sets the steps four across
+ * when they share a page; `grid` gives them a page of their own, two by two and larger.
+ */
+import { Image } from 'astro:assets';
+import type { ProductUsageStep } from '@/content.config';
+
+interface Props {
+  steps: ProductUsageStep[];
+  layout?: 'row' | 'grid';
+}
+
+const { steps, layout = 'row' } = Astro.props;
+const isGrid = layout === 'grid';
+---
+
+<section>
+  <h3 class:list={['font-bold text-navy-900', isGrid ? 'text-2xl' : 'text-lg']}>
+    How to use{' '}
+    <span lang="hi" class="ml-1 text-sm font-medium text-ink-500">
+      उपयोग की विधि
+    </span>
+  </h3>
+  <ol class:list={['mt-4 grid', isGrid ? 'grid-cols-2 gap-x-6 gap-y-6' : 'grid-cols-4 gap-4']}>
+    {steps.map(({ en, hi, image }, index) => (
+      <li>
+        {image && (
+          <div
+            class:list={[
+              'overflow-hidden rounded-xl bg-ink-100',
+              isGrid ? 'aspect-4/3' : 'aspect-4/5',
+            ]}
+          >
+            <Image
+              src={image}
+              alt=""
+              widths={[isGrid ? 680 : 360]}
+              sizes={isGrid ? '340px' : '165px'}
+              format="jpg"
+              quality={80}
+              class="size-full object-cover"
+            />
+          </div>
+        )}
+        <p class="mt-3 flex items-start gap-2">
+          <span class="grid size-6 shrink-0 place-items-center rounded-full bg-brand-700 text-xs font-bold text-white">
+            {index + 1}
+          </span>
+          <span
+            class:list={['leading-snug font-bold text-navy-900', isGrid ? 'text-base' : 'text-sm']}
+          >
+            {en}
+          </span>
+        </p>
+        {hi && (
+          <p lang="hi" class="mt-1 pl-8 text-xs leading-5 text-ink-600">
+            {hi}
+          </p>
+        )}
+      </li>
+    ))}
+  </ol>
+</section>

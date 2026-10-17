@@ -1,0 +1,50 @@
+---
+/**
+ * The brand's five promises as a row of round photo badges, the way the pack itself carries
+ * its claims: a small photo in a white-ringed circle, the promise in bold beneath, then its
+ * Hindi line. Five across on desktop; three over two, centred, on smaller screens.
+ * Photos are decorative (empty alt): the line under each carries the meaning.
+ */
+import { Image } from 'astro:assets';
+import Container from '@/components/ui/Container.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { BRAND_PROMISES } from '@/data/brand-promises';
+
+const ZOOM_CLASSES = {
+  none: '',
+  center: 'scale-125',
+  top: 'scale-125 origin-top',
+} as const;
+---
+
+<section aria-labelledby="promise-title" class="bg-ink-50 py-14 lg:py-20">
+  <Container>
+    <SectionHeader
+      id="promise-title"
+      title="Why choose Dinar"
+      subtitle="What every Dinar pack stands for."
+      align="center"
+    />
+    <ul class="mx-auto mt-10 flex max-w-6xl flex-wrap justify-center gap-y-10 lg:mt-14">
+      {BRAND_PROMISES.map(({ en, hi, image, zoom }) => (
+        <li class="reveal w-1/3 px-2 text-center sm:px-4 lg:w-1/5">
+          <div class="mx-auto size-22 overflow-hidden rounded-full bg-white ring-4 ring-white sm:size-28 lg:size-34">
+            <Image
+              src={image}
+              alt=""
+              widths={[176, 272, 352]}
+              sizes="(min-width: 1024px) 136px, (min-width: 640px) 112px, 88px"
+              class:list={['size-full object-cover', ZOOM_CLASSES[zoom]]}
+            />
+          </div>
+          <h3 class="mt-4 text-sm leading-snug font-bold text-balance text-navy-900 sm:text-base lg:mt-5 lg:text-lg">
+            {en}
+          </h3>
+          <p lang="hi" class="mt-1 text-xs text-ink-600 sm:text-sm">
+            {hi}
+          </p>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</section>

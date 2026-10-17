@@ -1,0 +1,108 @@
+---
+/**
+ * A pack's photos on the studio backdrop: the front shot (the page's LCP image, pre-built so
+ * the head can preload it) and, when the product has one, the back of the pack. Thumbnails
+ * switch between them: below the photo on phones, in a column beside it from lg, so both stay
+ * in view on a laptop screen. The back panel links to the full-size photo, so the small print
+ * can be read. src/scripts/product-gallery.ts does the switching.
+ */
+import type { GetImageResult, ImageMetadata } from 'astro';
+import { getImage, Image } from 'astro:assets';
+
+interface Props {
+  /** `fit` is the pack's frame-fit classes (see lib/pack-photo), so small packs sit smaller. */
+  front: { image: GetImageResult; source: ImageMetadata; alt: string; fit: string };
+  back?: { image: ImageMetadata; alt: string } | undefined;
+  sizes: string;
+}
+
+const { front, back, sizes } = Astro.props;
+const isLandscape = front.source.width > front.source.height;
+const backFull = back ? await getImage({ src: back.image, format: 'webp' }) : undefined;
+const views = back
+  ? [
+      { id: 'front', label: 'Front', image: front.source },
+      { id: 'back', label: 'Back', image: back.image },
+    ]
+  : [];
+const photoClass = 'h-auto w-auto mask-x-from-85% mask-y-from-85%';
+const panelClass = 'absolute inset-0 flex items-center justify-center';
+---
+
+<div data-js="product-gallery" class="lg:sticky lg:top-28 lg:flex lg:flex-row-reverse lg:gap-4">
+  <div
+    class:list={[
+      'bg-stage relative overflow-hidden rounded-3xl lg:flex-1',
+      isLandscape ? 'aspect-wide lg:aspect-4/3' : 'aspect-square',
+    ]}
+  >
+    <div data-gallery-panel="front" class:list={[panelClass, 'p-8 sm:p-14']}>
+      {/* getImage + <img> rather than <Image>: the same srcset must also feed the head preload. */}
+      <img
+        src={front.image.src}
+        srcset={front.image.srcSet.attribute}
+        sizes={sizes}
+        width={front.image.attributes['width']}
+        height={front.image.attributes['height']}
+        alt={front.alt}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        class:list={[photoClass, front.fit]}
+      />
+    </div>
+    {back && backFull && (
+      <a
+        data-gallery-panel="back"
+        hidden
+        href={backFull.src}
+        target="_blank"
+        rel="noopener"
+        class:list={[panelClass, 'p-3 sm:p-6']}
+      >
+        <Image
+          src={back.image}
+          alt={`${back.alt}. Opens the full-size photo in a new tab.`}
+          widths={[480, 720, 960, 1200]}
+          sizes={sizes}
+          class:list={[photoClass, 'max-h-full max-w-full']}
+        />
+      </a>
+    )}
+  </div>
+
+  {views.length > 0 && (
+    <ul aria-label="Pack views" class="mt-4 flex gap-3 lg:mt-0 lg:flex-col">
+      {views.map(({ id, label, image }, index) => (
+        <li>
+          <button
+            type="button"
+            data-gallery-show={id}
+            aria-pressed={index === 0 ? 'true' : 'false'}
+            class="group block rounded-2xl text-center focus-visible:outline-offset-4"
+          >
+            <span class="bg-stage block size-20 overflow-hidden rounded-2xl p-2 ring-2 ring-transparent transition-shadow group-hover:ring-ink-300 group-aria-pressed:ring-navy-900 sm:size-24 motion-reduce:transition-none">
+              <Image
+                src={image}
+                alt=""
+                widths={[96, 192]}
+                sizes="96px"
+                class="size-full object-contain"
+              />
+            </span>
+            <span class="mt-2 block text-sm font-semibold text-ink-600 group-aria-pressed:text-navy-900">
+              {label}
+              <span class="sr-only"> of pack</span>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
+<script>
+  import { initProductGalleries } from '@/scripts/product-gallery';
+
+  initProductGalleries();
+</script>

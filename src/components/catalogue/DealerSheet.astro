@@ -1,0 +1,102 @@
+---
+/**
+ * Safety and storage for the whole range, then the dealership: how it works, who can apply,
+ * and how to apply, with a QR code straight to the online application.
+ */
+import Sheet from '@/components/catalogue/Sheet.astro';
+import { site } from '@/config/site';
+import { BUSINESS_TYPES } from '@/data/dealer-form-options';
+import { SAFETY_LEAD, SAFETY_PRECAUTIONS } from '@/data/safety-precautions';
+import { formatPhone } from '@/lib/format-phone';
+import { qrCodeSvg } from '@/lib/qr-code';
+
+interface Props {
+  page: number;
+  total: number;
+  edition: string;
+}
+
+const { page, total, edition } = Astro.props;
+const dealershipUrl = new URL('/dealership/', site.url);
+const qr = await qrCodeSvg(dealershipUrl.href);
+const applicants = BUSINESS_TYPES.filter(({ value }) => value !== 'other');
+const STEPS = [
+  { title: 'Apply', text: 'Send your business details and the area you cover.' },
+  { title: 'Talk to the Dinar team', text: 'We review every application and call you.' },
+  { title: 'Start stocking', text: 'Once agreed, bring the Dinar range to your customers.' },
+] as const;
+---
+
+<Sheet page={page} total={total} edition={edition}>
+  <section class="rounded-2xl bg-ink-50 p-5">
+    <p class="text-sm font-bold tracking-wide text-brand-700 uppercase">
+      Caution{' '}
+      <span lang="hi" class="ml-1 font-semibold tracking-normal normal-case">
+        सावधानी
+      </span>
+    </p>
+    <h2 class="mt-1 text-2xl font-bold tracking-tight text-navy-900">
+      Safety &amp; storage, for the whole range
+    </h2>
+    <p class="mt-4 font-bold text-navy-900">
+      {SAFETY_LEAD.en}{' '}
+      <span lang="hi" class="ml-1 text-sm font-medium text-ink-600">
+        {SAFETY_LEAD.hi}
+      </span>
+    </p>
+    <dl class="mt-4 grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+      {SAFETY_PRECAUTIONS.map(({ topic, en }) => (
+        <div>
+          <dt class="font-semibold text-ink-500">{topic}</dt>
+          <dd class="font-semibold text-navy-900">{en}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="mt-8">
+    <p class="text-sm font-bold tracking-wide text-brand-700 uppercase">
+      Dealership{' '}
+      <span lang="hi" class="ml-1 font-semibold tracking-normal normal-case">
+        डीलरशिप
+      </span>
+    </p>
+    <h2 class="mt-2 text-4xl font-bold tracking-tight text-navy-900">Become a Dinar dealer</h2>
+    <p class="mt-3 max-w-xl leading-7 text-ink-700">
+      Dinar works with retailers, wholesalers and distributors. Tell us about your business and the
+      area you cover, and the Dinar team will get in touch.
+    </p>
+
+    <ol class="mt-5 grid grid-cols-3 gap-4">
+      {STEPS.map(({ title, text }, index) => (
+        <li class="rounded-2xl bg-ink-50 p-4">
+          <span class="grid size-8 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white">
+            {index + 1}
+          </span>
+          <p class="mt-3 font-bold text-navy-900">{title}</p>
+          <p class="mt-1 text-sm text-ink-600">{text}</p>
+        </li>
+      ))}
+    </ol>
+
+    <h3 class="mt-6 text-sm font-bold tracking-wide text-ink-500 uppercase">Who can apply</h3>
+    <ul class="mt-3 flex flex-wrap gap-2">
+      {applicants.map(({ label }) => (
+        <li class="rounded-full bg-ink-50 px-4 py-2 text-sm font-bold text-navy-900">{label}</li>
+      ))}
+    </ul>
+
+    <div class="mt-6 flex items-center gap-8 rounded-2xl bg-navy-900 p-5 text-white">
+      <div class="qr size-32 shrink-0 rounded-xl bg-white p-3 text-navy-900" set:html={qr} />
+      <div>
+        <p class="text-sm text-white/70">Apply online: scan the code or visit</p>
+        <p class="mt-1 text-2xl font-bold">
+          {dealershipUrl.host}
+          {dealershipUrl.pathname}
+        </p>
+        <p class="mt-4 text-sm text-white/70">Or call or WhatsApp the Dinar team</p>
+        <p class="mt-1 text-xl font-bold tabular-nums">{formatPhone(site.whatsappNumber)}</p>
+      </div>
+    </div>
+  </section>
+</Sheet>

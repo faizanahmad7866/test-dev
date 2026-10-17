@@ -1,0 +1,42 @@
+---
+/**
+ * A slow, continuous strip of customer benefits on navy, between the hero and the range.
+ * CSS only: the list runs twice side by side and the track slides by exactly one copy, so the
+ * loop has no seam. It pauses under the pointer or keyboard focus (WCAG 2.2.2), and for
+ * visitors who prefer reduced motion it stands still, centred and wrapped. Screen readers
+ * hear the list once; the second copy exists only to close the loop.
+ */
+import { BRAND_STRIP } from '@/data/brand-strip';
+
+const copies = [false, true] as const;
+---
+
+<section aria-label="Benefits" class="marquee overflow-hidden bg-navy-900 text-white">
+  <div class="mask-x-from-92% motion-reduce:mask-none">
+    <div class="marquee-track flex w-max motion-safe:animate-marquee motion-reduce:w-full motion-reduce:justify-center">
+      {copies.map((isDuplicate) => (
+        <ul
+          aria-hidden={isDuplicate ? 'true' : undefined}
+          class:list={[
+            'flex shrink-0 items-center',
+            isDuplicate
+              ? 'motion-reduce:hidden'
+              : 'motion-reduce:w-full motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:px-4 motion-reduce:py-3',
+          ]}
+        >
+          {BRAND_STRIP.map((benefit) => (
+            <li class="group flex items-center gap-6 py-4 pr-6 motion-reduce:py-1 sm:gap-8 sm:pr-8 lg:py-5 lg:motion-reduce:py-1">
+              <span class="text-base font-bold tracking-tight whitespace-nowrap sm:text-lg">
+                {benefit}
+              </span>
+              <span
+                class="size-1.5 shrink-0 rounded-full bg-brand-500 motion-reduce:group-last:hidden"
+                aria-hidden="true"
+              />
+            </li>
+          ))}
+        </ul>
+      ))}
+    </div>
+  </div>
+</section>

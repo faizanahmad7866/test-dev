@@ -1,0 +1,70 @@
+---
+/**
+ * The range on the home page. Phones get every pack in one swipeable row of simple cards,
+ * each leading to the pack's page, where ordering lives. From sm up the range is
+ * merchandised: packs sold online lead as large cards with "Shop now", the rest follow as
+ * smaller cards.
+ */
+import HomeFeaturedCard from '@/components/home/HomeFeaturedCard.astro';
+import HomePackCard from '@/components/home/HomePackCard.astro';
+import HomeSwipeCard from '@/components/home/HomeSwipeCard.astro';
+import Container from '@/components/ui/Container.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+import { productGridColumns } from '@/lib/product-grid';
+import type { ProductSku } from '@/lib/product-skus';
+
+interface Props {
+  skus: ProductSku[];
+}
+
+const { skus } = Astro.props;
+const featured = skus.filter(({ variant }) => variant.onlineOrder);
+const others = skus.filter(({ variant }) => !variant.onlineOrder);
+---
+
+<section aria-labelledby="home-range-title" class="bg-ink-50 py-14 lg:py-20">
+  <Container>
+    <SectionHeader
+      id="home-range-title"
+      title="Our products"
+      subtitle="Detergent powder and detergent cake, in the pack size that suits you."
+      link={{ href: '/products/', label: 'View all products' }}
+    />
+
+    <ul class="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 sm:hidden">
+      {skus.map((sku) => (
+        <li class="reveal w-3/4 shrink-0 snap-start">
+          <HomeSwipeCard sku={sku} />
+        </li>
+      ))}
+    </ul>
+
+    <div class="hidden sm:block">
+      {featured.length > 0 && (
+        <ul class="mt-10 grid gap-5 lg:gap-6 xl:grid-cols-2">
+          {featured.map((sku) => (
+            <li class="reveal">
+              <HomeFeaturedCard sku={sku} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {others.length > 0 && (
+        <ul
+          class:list={[
+            'grid grid-cols-2 gap-6',
+            featured.length > 0 ? 'mt-5 lg:mt-6' : 'mt-10',
+            productGridColumns(others.length),
+          ]}
+        >
+          {others.map((sku) => (
+            <li class="reveal">
+              <HomePackCard sku={sku} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </Container>
+</section>
